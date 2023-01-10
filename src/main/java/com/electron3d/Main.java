@@ -5,7 +5,7 @@ import com.electron3d.model.IslandSimulation;
 
 public class Main {
     public static void main(String[] args) {
-        SimulationEngine engine = new SimulationEngine(new IslandSimulation(), 100, 1);
+        SimulationEngine engine = new SimulationEngine(new IslandSimulation(), 1, 1);
         engine.start();
     }
 }

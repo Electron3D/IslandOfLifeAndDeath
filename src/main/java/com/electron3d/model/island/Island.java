@@ -10,7 +10,7 @@ public class Island {
     private final int parallelLength;
     private final int meridianLength;
     private final Field[][] fields;
-    private List<Animal> allAnimals;
+    private List<Animal> animalPull;
     private final Random random = new Random();
 
     public Island(int parallelLength, int meridianLength) {
@@ -20,13 +20,13 @@ public class Island {
     }
 
     public void init() {
-        initAllAnimals();
+        initAnimalPull();
         initFields();
     }
 
-    private void initAllAnimals() {
+    private void initAnimalPull() {
         //init allAnimals;
-        allAnimals = new ArrayList<>();
+        animalPull = new ArrayList<>();
     }
 
     private void initFields() {
@@ -44,7 +44,7 @@ public class Island {
         field.setPlantsOnThisField(random.nextInt(200));
     }
     private void initAnimals(Field field) {
-        for (Animal animal: allAnimals) {
+        for (Animal animal: animalPull) {
             field.amountOfAnimalsOnTheField.put(animal.getClass().getSimpleName(), random.nextInt(animal.getBoundOnTheSameField()));
         }
     }
@@ -59,6 +59,9 @@ public class Island {
                     fieldsToString.append(" ");
                 }
                 if (field.getY() < 10) {
+                    fieldsToString.append(" ");
+                }
+                if (field.getPlantsOnThisField() < 100) {
                     fieldsToString.append(" ");
                 }
             }

@@ -15,7 +15,7 @@ public class Field {
     public Field(int x, int y) {
         this.x = x;
         this.y = y;
-        amountOfAnimalsOnTheField = new HashMap<>();
+        this.amountOfAnimalsOnTheField = new HashMap<>();
     }
     public int getX() {
         return x;
@@ -35,6 +35,6 @@ public class Field {
 
     @Override
     public String toString() {
-        return "{" + x + "," + y + "}";
+        return "{" + x + "," + y + "|plants:" + plantsOnThisField + "}";
     }
 }
