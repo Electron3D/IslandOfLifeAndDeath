@@ -9,12 +9,16 @@ public class IslandSimulation implements Simulation{
     public void init() {
         System.out.println("Initialization...");
         island = new Island(5, 5);
+        island.init();
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Initialization complete!\n");
+        System.out.println("Initialization complete!");
+        System.out.println();
+        System.out.println();
+        System.out.println();
     }
 
     @Override

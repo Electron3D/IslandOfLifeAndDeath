@@ -1,18 +1,36 @@
 package com.electron3d.model.island;
 
-import com.electron3d.model.Animal;
-
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Field {
-    int x;
-    int y;
-    List<Animal> animals;
-    int plants;
+    private final int x;
+
+    private final int y;
+
+    public final Map<String, Integer> amountOfAnimalsOnTheField;
+
+    private int plantsOnThisField;
 
     public Field(int x, int y) {
         this.x = x;
         this.y = y;
+        amountOfAnimalsOnTheField = new HashMap<>();
+    }
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getPlantsOnThisField() {
+        return plantsOnThisField;
+    }
+
+    public void setPlantsOnThisField(int plantsOnThisField) {
+        this.plantsOnThisField = plantsOnThisField;
     }
 
     @Override
