@@ -11,8 +11,8 @@ public class Island {
     private final int meridianLength;
     private final Field[][] fields;
     private final Set<String> animalsSpecies;
-    private final List<Plant> plantsPull;
-    private final List<Animal> animalsPull;
+    private final List<Plant> plantsPull  = new ArrayList<>();
+    private final List<Animal> animalsPull = new ArrayList<>();
     private final Random random = new Random();
 
     public Island(int parallelLength, int meridianLength, Set<String> animalsSpecies) {
@@ -20,8 +20,6 @@ public class Island {
         this.meridianLength = meridianLength;
         this.fields = new Field[meridianLength][parallelLength];
         this.animalsSpecies = animalsSpecies;
-        this.animalsPull = new ArrayList<>();
-        this.plantsPull = new ArrayList<>();
     }
 
     public void initFields() {

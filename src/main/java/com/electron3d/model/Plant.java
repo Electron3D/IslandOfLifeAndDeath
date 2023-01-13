@@ -4,7 +4,7 @@ import com.electron3d.model.island.Field;
 
 import java.util.Random;
 
-public class Plant {
+public class Plant implements Eatable {
     public static final int BOUND_ON_THE_SAME_FIELD = 200;
     private final Field location;
 
@@ -25,6 +25,11 @@ public class Plant {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int restoreHP() {
+        return 0;
     }
 
     public Field getLocation() {
