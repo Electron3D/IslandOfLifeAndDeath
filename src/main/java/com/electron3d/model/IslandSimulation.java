@@ -13,7 +13,7 @@ public class IslandSimulation implements Simulation {
     public void init() {
         System.out.println("Loading configuration...");
         IslandSimulationConfig config = IslandSimulationConfig.getInstance();
-        Set<String> animalTypes = new HashSet<>(List.of("Horse", "Deer", "Duck"));   //todo, temporary hardcoded
+        Set<String> animalTypes = new HashSet<>(List.of("Horse", "Deer", "Duck", "Wolf", "Bear"));   //todo, temporary hardcoded
         //Set<String> animalTypes = config.getAnimalTypes();
         System.out.println("Configuration loaded");
         System.out.println("Creating an island...");
@@ -32,10 +32,8 @@ public class IslandSimulation implements Simulation {
         System.out.println("Plants are growing");
         island.growPlants();
 
-        System.out.println("Animals are walking");
-        island.migrateAnimals();
-        System.out.println("Dinner time!");
-        island.haveAMeal();
+        System.out.println("Animals living");
+        island.liveADay();
 
         System.out.println("Results are printing");
         printSimulationResults();

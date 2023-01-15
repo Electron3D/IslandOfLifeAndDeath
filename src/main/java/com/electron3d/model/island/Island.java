@@ -29,6 +29,11 @@ public class Island {
                 Field field = fields[y][x];
                 field.plantsOnTheField.addAll(initPlants(field));
                 field.animalsOnTheField.addAll(initAnimals(field));
+            }
+        }
+        for (int y = 0; y < fields.length; y++) {
+            for (int x = 0; x < fields[y].length; x++) {
+                Field field = fields[y][x];
                 field.possibleWays.addAll(initPossibleWays(field));
             }
         }
@@ -88,10 +93,10 @@ public class Island {
         plantsPull.addAll(newGrownPlants);
     }
 
-    public void migrateAnimals() {
-    }
-
-    public void haveAMeal() {
+    public void liveADay() {
+        for (Animal animal : animalsPull) {
+            animal.doAnimalStuff();
+        }
     }
 
     public List<Plant> getPlantsPull() {

@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
         SimulationConfigBuilder builder = new SimulationConfigBuilder();
         builder.built();
-        SimulationEngine engine = new SimulationEngine(new IslandSimulation(), 100, 1);
+        SimulationEngine engine = new SimulationEngine(new IslandSimulation(), 100, 1); //todo add parameters from config
         engine.start();
     }
 }
