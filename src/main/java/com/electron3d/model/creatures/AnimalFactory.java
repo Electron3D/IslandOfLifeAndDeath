@@ -22,6 +22,7 @@ public class AnimalFactory {
             case "Fox" -> new Fox(location);
             case "Python" -> new Python(location);
             case "Wolf" -> new Wolf(location);
+            default -> throw new RuntimeException();
         };
     }
 }
