@@ -1,26 +1,27 @@
 package com.electron3d.model.island;
 
+import com.electron3d.model.creatures.Animal;
+import com.electron3d.model.creatures.Plant;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Field {
+
+    //todo private modifiers and correct access for collections
+    public final Map<String, Integer> amountOfAnimalsOnTheField = new HashMap<>();
+    public final List<Animal> animalsOnTheField = new ArrayList<>();
+    public final List<Plant> plantsOnTheField = new ArrayList<>();
+    public final List<Field> possibleWays = new ArrayList<>();
     private final int x;
-
     private final int y;
-
-    private final List<Field> possibleWays;
-
-    private int plantsOnThisField;
-
-    public final Map<String, Integer> amountOfAnimalsOnTheField;
+    private int amountOfPlantsOnTheField;
 
     public Field(int x, int y) {
         this.x = x;
         this.y = y;
-        this.possibleWays = new ArrayList<>();
-        this.amountOfAnimalsOnTheField = new HashMap<>();
     }
 
     public int getX() {
@@ -31,20 +32,16 @@ public class Field {
         return y;
     }
 
-    public List<Field> getPossibleWays() {
-        return possibleWays;
+    public int getAmountOfPlantsOnTheField() {
+        return amountOfPlantsOnTheField;
     }
 
-    public int getPlantsOnThisField() {
-        return plantsOnThisField;
-    }
-
-    public void setPlantsOnThisField(int plantsOnThisField) {
-        this.plantsOnThisField = plantsOnThisField;
+    public void setAmountOfPlantsOnTheField(int amountOfPlantsOnTheField) {
+        this.amountOfPlantsOnTheField = amountOfPlantsOnTheField;
     }
 
     @Override
     public String toString() {
-        return "{" + x + "," + y + "|plants:" + plantsOnThisField + "|animals:" + amountOfAnimalsOnTheField.values().stream().reduce(Integer::sum).orElseThrow() + "}"; //temporary
+        return "{" + x + "," + y + "|plants:" + amountOfPlantsOnTheField + "|animals:" + amountOfAnimalsOnTheField.values().stream().reduce(Integer::sum).orElseThrow() + "}"; //todo
     }
 }

@@ -6,14 +6,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class IslandSimulation implements Simulation{
+public class IslandSimulation implements Simulation {
     private Island island;
 
     @Override
     public void init() {
+        System.out.println("Loading configuration...");
+        IslandSimulationConfig config = IslandSimulationConfig.getInstance();
+        Set<String> animalTypes = new HashSet<>(List.of("Horse", "Deer", "Duck"));   //todo, temporary hardcoded
+        //Set<String> animalTypes = config.getAnimalTypes();
+        System.out.println("Configuration loaded");
+        System.out.println("Creating an island...");
+        island = new Island(10, 10, animalTypes);
+        System.out.println("The island created");
         System.out.println("Initialization...");
-        Set<String> animalsSpecies = new HashSet<>(List.of("Horse"));   //temporary hardcoded
-        island = new Island(10, 10, animalsSpecies);
         island.initFields();
         System.out.println("Initialization complete!");
         System.out.println();
@@ -27,7 +33,9 @@ public class IslandSimulation implements Simulation{
         island.growPlants();
 
         System.out.println("Animals are walking");
+        island.migrateAnimals();
         System.out.println("Dinner time!");
+        island.haveAMeal();
 
         System.out.println("Results are printing");
         printSimulationResults();

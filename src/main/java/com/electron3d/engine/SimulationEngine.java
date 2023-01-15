@@ -18,6 +18,9 @@ public class SimulationEngine {
         simulation.init();
         System.out.println("Starting config:");
         simulation.printSimulationResults();
+        System.out.println();
+        System.out.println();
+        System.out.println();
 
         while (timer != maxTimer * 60) {
             System.out.println("Day: " + ++timer);

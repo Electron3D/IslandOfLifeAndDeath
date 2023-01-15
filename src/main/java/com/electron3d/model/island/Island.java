@@ -1,25 +1,25 @@
 package com.electron3d.model.island;
 
-import com.electron3d.model.Animal;
-import com.electron3d.model.Plant;
+import com.electron3d.model.*;
+import com.electron3d.model.creatures.Animal;
+import com.electron3d.model.creatures.AnimalFactory;
+import com.electron3d.model.creatures.Plant;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Island {
     private final int parallelLength;
     private final int meridianLength;
     private final Field[][] fields;
-    private final Set<String> animalsSpecies;
+    private final Set<String> animalTypes;
     private final List<Plant> plantsPull  = new ArrayList<>();
     private final List<Animal> animalsPull = new ArrayList<>();
-    private final Random random = new Random();
 
-    public Island(int parallelLength, int meridianLength, Set<String> animalsSpecies) {
+    public Island(int parallelLength, int meridianLength, Set<String> animalTypes) {
         this.parallelLength = parallelLength;
         this.meridianLength = meridianLength;
         this.fields = new Field[meridianLength][parallelLength];
-        this.animalsSpecies = animalsSpecies;
+        this.animalTypes = animalTypes;
     }
 
     public void initFields() {
@@ -27,38 +27,55 @@ public class Island {
             for (int x = 0; x < fields[y].length; x++) {
                 fields[y][x] = new Field(x, y);
                 Field field = fields[y][x];
-                initPlants(field);
-                initAnimals(field);
+                field.plantsOnTheField.addAll(initPlants(field));
+                field.animalsOnTheField.addAll(initAnimals(field));
+                field.possibleWays.addAll(initPossibleWays(field));
             }
         }
     }
 
-    private void initPlants(Field field) {
-        field.setPlantsOnThisField(random.nextInt(Plant.BOUND_ON_THE_SAME_FIELD));
-        for (int i = 0; i < field.getPlantsOnThisField(); i++) {
-            plantsPull.add(new Plant(field));
+    private List<Plant> initPlants(Field field) {
+        Random startingPlantsCountChooser = new Random();
+        field.setAmountOfPlantsOnTheField(startingPlantsCountChooser.nextInt(Plant.BOUND_ON_THE_SAME_FIELD));
+        List<Plant> plantsOnTheField = new ArrayList<>();
+        for (int i = 0; i < field.getAmountOfPlantsOnTheField(); i++) {
+            plantsOnTheField.add(new Plant(field));
         }
+        plantsPull.addAll(plantsOnTheField);
+        return plantsOnTheField;
     }
 
-    /*
-    * оч плохо, над переделать, но работает
-    */
-    private void initAnimals(Field field) {
-        for (String animalName : animalsSpecies) {
-            field.amountOfAnimalsOnTheField.put(animalName, random.nextInt(60)); //add bound
+    private List<Animal> initAnimals(Field field) {
+        Random startingAnimalsCountChooser = new Random();
+        IslandSimulationConfig config = IslandSimulationConfig.getInstance();
+        for (String animalType : animalTypes) {
+            field.amountOfAnimalsOnTheField.put(animalType, startingAnimalsCountChooser.nextInt(config.getBoundForType(animalType)));
         }
+        AnimalFactory factory = new AnimalFactory();
+        List<Animal> animalsOnTheField = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : field.amountOfAnimalsOnTheField.entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
-                String path = "com.electron3d.model.animals.herbivores.";
-                String animalName = entry.getKey();
-                try {
-                    animalsPull.add((Animal) Class.forName(path + animalName).getConstructor(double.class, int.class, double.class, Field.class).newInstance(400.0, 4, 60, field));
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                         NoSuchMethodException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                Animal animal = factory.createAnimal(entry.getKey(), field);
+                animalsOnTheField.add(animal);
+            }
+        }
+        animalsPull.addAll(animalsOnTheField);
+        return animalsOnTheField;
+    }
+    private List<Field> initPossibleWays(Field field) {
+        List<Field> possibleWays = new ArrayList<>();
+        int i0 = field.getX();
+        int j0 = field.getY();
+        int height = fields.length;
+        int width = fields[0].length;
+        for (int i = i0 - 1; i <= i0 + 1; ++i) {
+            for (int j = j0 - 1; j <= j0 + 1; ++j) {
+                if (0 <= i && i < height && 0 <= j && j < width && (i != i0 || j != j0)) {
+                    possibleWays.add(fields[i][j]);
                 }
             }
         }
+        return possibleWays;
     }
 
     public void growPlants() {
@@ -69,6 +86,12 @@ public class Island {
             }
         }
         plantsPull.addAll(newGrownPlants);
+    }
+
+    public void migrateAnimals() {
+    }
+
+    public void haveAMeal() {
     }
 
     public List<Plant> getPlantsPull() {
@@ -91,7 +114,7 @@ public class Island {
                 if (field.getY() < 10) {
                     fieldsToString.append(" ");
                 }
-                if (field.getPlantsOnThisField() < 100) {
+                if (field.getAmountOfPlantsOnTheField() < 100) {
                     fieldsToString.append(" ");
                 }
             }
