@@ -2,6 +2,8 @@ package com.electron3d.model.creatures;
 
 import com.electron3d.model.island.Field;
 
+import java.util.NoSuchElementException;
+
 public abstract class Animal {
     private Field location;
 
@@ -9,10 +11,18 @@ public abstract class Animal {
         this.location = location;
     }
     public void doAnimalStuff() {
-        eat((Eatable) location.animalsOnTheField.stream().filter(x -> x instanceof Eatable).findAny().orElseThrow());
+        try {
+            eat((Eatable) location.animalsOnTheField.stream().filter(x -> x instanceof Eatable).findAny().orElseThrow()); //redo
+        } catch (NoSuchElementException e) {
+            die();
+        }
         breed();
         walk();
     }
+
+    private void die() {
+    }
+
     public void eat(Eatable food) {
 
     }
