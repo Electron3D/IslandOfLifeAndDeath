@@ -5,10 +5,7 @@ import com.electron3d.model.creatures.animals.Predatory;
 import com.electron3d.model.creatures.animals.herbivores.Duck;
 import com.electron3d.model.island.Field;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 public abstract class Animal {
     private Field location;
@@ -25,7 +22,7 @@ public abstract class Animal {
                     //todo
                     System.out.println("Я утка");
                 } else if (this instanceof Predatory) {
-                    eat((Eatable) location.animalsOnTheField.stream().filter(x -> x instanceof Eatable).findAny().orElseThrow());
+                    eat((Eatable) location.animalsOnTheField.stream().filter(x -> x instanceof Eatable).findAny().orElseThrow()); //todo исключить текущий объект
                     System.out.println("Я хищник");
                 } else if (this instanceof Herbivores) {
                     eat(location.plantsOnTheField.stream().findAny().orElseThrow());
@@ -56,22 +53,15 @@ public abstract class Animal {
     }
 
     public void walk() {
-        //decide where to walk
-        changeLocation();
+        Field destinationField = chooseDirection();
+        changeLocation(destinationField);
     }
 
-    private boolean makeADecision() {
-        return false;
+    private Field chooseDirection() {
+        return location.possibleWays.get(0);
     }
 
-    private void changeLocation() {
-    }
+    private void changeLocation(Field destinationField) {
 
-    public Field getLocation() {
-        return location;
-    }
-
-    public void setLocation(Field location) {
-        this.location = location;
     }
 }
