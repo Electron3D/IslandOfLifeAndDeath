@@ -33,7 +33,7 @@ public class IslandSimulation implements Simulation {
         island.growPlants();
 
         System.out.println("Animals living");
-        island.liveADay();
+        island.doAnimalStuff();
 
         System.out.println("Results are printing");
         printSimulationResults();

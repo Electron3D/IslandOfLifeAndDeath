@@ -93,9 +93,9 @@ public class Island {
         plantsPull.addAll(newGrownPlants);
     }
 
-    public void liveADay() {
+    public void doAnimalStuff() {
         for (Animal animal : animalsPull) {
-            animal.doAnimalStuff();
+            animal.liveADay();
         }
     }
 
