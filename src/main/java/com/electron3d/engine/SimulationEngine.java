@@ -3,10 +3,10 @@ package com.electron3d.engine;
 import com.electron3d.model.Simulation;
 
 public class SimulationEngine {
-    private int speed;
-    private int maxTimer;
+    private final Simulation simulation;
+    private final int speed;
+    private final int maxTimer;
     private int timer;
-    private Simulation simulation;
 
     public SimulationEngine(Simulation simulation, int speed, int maxTimer) {
         this.simulation = simulation;

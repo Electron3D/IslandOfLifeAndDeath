@@ -8,10 +8,11 @@ import com.electron3d.model.island.Field;
 import java.util.NoSuchElementException;
 
 public abstract class Animal {
-    private AnimalProperties properties;
+    private final AnimalProperties properties;
     private Field location;
 
-    public Animal(Field location) {
+    public Animal(AnimalProperties properties, Field location) {
+        this.properties = properties;
         this.location = location;
     }
 

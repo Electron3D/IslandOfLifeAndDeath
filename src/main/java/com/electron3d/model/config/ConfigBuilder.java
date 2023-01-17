@@ -1,10 +1,10 @@
 package com.electron3d.model.config;
 
-public class ConfigBuilder {
+public abstract class ConfigBuilder<Config> {
+    protected Config toReturn;
 
-    private Config config;
-
-    public void built() {
-        config = IslandConfig.getInstance();
+    protected ConfigBuilder() {
     }
+    protected abstract void initFieldsFromSourceFile();
+    public abstract Config buildAndGetConfig();
 }

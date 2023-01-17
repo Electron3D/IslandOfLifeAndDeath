@@ -1,7 +1,5 @@
 package com.electron3d.model;
 
-import com.electron3d.model.config.IslandConfig;
-import com.electron3d.model.config.ConfigBuilder;
 import com.electron3d.model.island.Island;
 
 import java.util.HashSet;
@@ -14,11 +12,7 @@ public class IslandSimulation implements Simulation {
     @Override
     public void init() {
         System.out.println("Loading configuration...");
-        ConfigBuilder builder = new ConfigBuilder();
-        builder.built();
-        IslandConfig config = IslandConfig.getInstance();
         Set<String> animalTypes = new HashSet<>(List.of("Horse", "Deer", "Duck", "Wolf", "Bear"));   //todo, temporary hardcoded
-        //Set<String> animalTypes = config.getAnimalTypes();
         System.out.println("Configuration loaded");
         System.out.println("Creating an island...");
         island = new Island(10, 10, animalTypes); ////todo, temporary hardcoded

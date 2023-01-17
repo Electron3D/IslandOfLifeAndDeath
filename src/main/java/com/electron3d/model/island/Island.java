@@ -1,6 +1,5 @@
 package com.electron3d.model.island;
 
-import com.electron3d.model.config.IslandConfig;
 import com.electron3d.model.creatures.Animal;
 import com.electron3d.model.creatures.AnimalFactory;
 import com.electron3d.model.creatures.Plant;
@@ -52,9 +51,8 @@ public class Island {
 
     private List<Animal> initAnimals(Field field) {
         Random startingAnimalsCountChooser = new Random();
-        IslandConfig config = IslandConfig.getInstance();
         for (String animalType : animalTypes) {
-            field.amountOfAnimalsOnTheField.put(animalType, startingAnimalsCountChooser.nextInt(config.getBoundForType(animalType)));
+            field.amountOfAnimalsOnTheField.put(animalType, startingAnimalsCountChooser.nextInt(10)); //todo add bound from config
         }
         AnimalFactory factory = new AnimalFactory();
         List<Animal> animalsOnTheField = new ArrayList<>();

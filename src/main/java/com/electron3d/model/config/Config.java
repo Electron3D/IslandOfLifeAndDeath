@@ -1,4 +1,5 @@
 package com.electron3d.model.config;
 
-public interface Config {
+public abstract class Config {
+    
 }
