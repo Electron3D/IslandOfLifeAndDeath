@@ -1,13 +1,14 @@
 package com.electron3d.model.creatures;
 
-import com.electron3d.model.creatures.animals.Herbivores;
-import com.electron3d.model.creatures.animals.Predatory;
+import com.electron3d.model.creatures.animals.HerbivoresAnimal;
+import com.electron3d.model.creatures.animals.PredatorAnimal;
 import com.electron3d.model.creatures.animals.herbivores.Duck;
 import com.electron3d.model.island.Field;
 
 import java.util.NoSuchElementException;
 
 public abstract class Animal {
+    private AnimalProperties properties;
     private Field location;
 
     public Animal(Field location) {
@@ -21,10 +22,10 @@ public abstract class Animal {
                 if (this instanceof Duck) {
                     //todo
                     System.out.println("Я утка");
-                } else if (this instanceof Predatory) {
+                } else if (this instanceof PredatorAnimal) {
                     eat((Eatable) location.animalsOnTheField.stream().filter(x -> x instanceof Eatable).findAny().orElseThrow()); //todo исключить текущий объект
                     System.out.println("Я хищник");
-                } else if (this instanceof Herbivores) {
+                } else if (this instanceof HerbivoresAnimal) {
                     eat(location.plantsOnTheField.stream().findAny().orElseThrow());
                     System.out.println("Я травоядное");
                 }

@@ -1,6 +1,6 @@
 package com.electron3d.model.island;
 
-import com.electron3d.model.*;
+import com.electron3d.model.config.IslandConfig;
 import com.electron3d.model.creatures.Animal;
 import com.electron3d.model.creatures.AnimalFactory;
 import com.electron3d.model.creatures.Plant;
@@ -52,7 +52,7 @@ public class Island {
 
     private List<Animal> initAnimals(Field field) {
         Random startingAnimalsCountChooser = new Random();
-        IslandSimulationConfig config = IslandSimulationConfig.getInstance();
+        IslandConfig config = IslandConfig.getInstance();
         for (String animalType : animalTypes) {
             field.amountOfAnimalsOnTheField.put(animalType, startingAnimalsCountChooser.nextInt(config.getBoundForType(animalType)));
         }
