@@ -29,7 +29,7 @@ public class AnimalsConfig extends Config {
         return animalsProperties;
     }
 
-    public static class AnimalsConfigBuilder<T extends AnimalsConfig> extends ConfigBuilder<T> {
+    private static class AnimalsConfigBuilder<T extends AnimalsConfig> extends ConfigBuilder<T> {
         private static final String ANIMALS_SPECS_FILE_NAME = "animalsSpecs.csv";
 
         public AnimalsConfigBuilder(T animalsConfig) {

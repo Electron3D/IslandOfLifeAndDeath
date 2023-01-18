@@ -17,7 +17,7 @@ public abstract class Animal {
     }
 
     public void liveADay() {
-        int numberOfStepsLeft = 3; //todo add speed here
+        int numberOfStepsLeft = properties.getRange();
         while (true) {
             try {
                 if (this instanceof Duck) {
@@ -64,6 +64,13 @@ public abstract class Animal {
     }
 
     private void changeLocation(Field destinationField) {
+    }
 
+    public Field getLocation() {
+        return location;
+    }
+
+    public void setLocation(Field location) {
+        this.location = location;
     }
 }
