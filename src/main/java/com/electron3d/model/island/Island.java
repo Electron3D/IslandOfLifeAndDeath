@@ -10,11 +10,11 @@ public class Island {
     private final int parallelLength;
     private final int meridianLength;
     private final Field[][] fields;
-    private final Set<String> animalTypes;
+    private final List<String> animalTypes;
     private final List<Plant> plantsPull  = new ArrayList<>();
     private final List<Animal> animalsPull = new ArrayList<>();
 
-    public Island(int parallelLength, int meridianLength, Set<String> animalTypes) {
+    public Island(int parallelLength, int meridianLength, List<String> animalTypes) {
         this.parallelLength = parallelLength;
         this.meridianLength = meridianLength;
         this.fields = new Field[meridianLength][parallelLength];

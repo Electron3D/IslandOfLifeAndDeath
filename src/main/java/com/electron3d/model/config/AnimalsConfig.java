@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class AnimalsConfig extends Config {
     private static AnimalsConfig INSTANCE;
-    private final List<String> animalsNames = new ArrayList<>();
+    private final List<String> animalsTypes = new ArrayList<>();
     private final List<AnimalProperties> animalsProperties = new ArrayList<>();
 
     public static AnimalsConfig getInstance() {
@@ -21,8 +21,8 @@ public class AnimalsConfig extends Config {
     private AnimalsConfig() {
     }
 
-    public List<String> getAnimalsNames() {
-        return animalsNames;
+    public List<String> getAnimalsTypes() {
+        return animalsTypes;
     }
 
     public List<AnimalProperties> getAnimalsProperties() {
@@ -39,11 +39,12 @@ public class AnimalsConfig extends Config {
         @Override
         protected void initFieldsFromSourceFile() {
             List<String> lines = readLinesFromCsv();
-            toReturn.getAnimalsNames().addAll(getAnimalsNamesFrom(lines));
+            toReturn.getAnimalsTypes().addAll(getAnimalsNamesFrom(lines));
             toReturn.getAnimalsProperties().addAll(getAllAnimalPropertiesFrom(lines));
         }
 
-        private List<String> readLinesFromCsv() {
+        @Override
+        protected List<String> readLinesFromCsv() {
             return new ArrayList<>();//todo
         }
 

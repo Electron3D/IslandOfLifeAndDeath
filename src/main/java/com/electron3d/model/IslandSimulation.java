@@ -1,10 +1,10 @@
 package com.electron3d.model;
 
+import com.electron3d.model.config.AnimalsConfig;
+import com.electron3d.model.config.IslandSimulationConfig;
 import com.electron3d.model.island.Island;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class IslandSimulation implements Simulation {
     private Island island;
@@ -12,10 +12,15 @@ public class IslandSimulation implements Simulation {
     @Override
     public void init() {
         System.out.println("Loading configuration...");
-        Set<String> animalTypes = new HashSet<>(List.of("Horse", "Deer", "Duck", "Wolf", "Bear"));   //todo, temporary hardcoded
+        AnimalsConfig animalsConfig = AnimalsConfig.getInstance();
+        List<String> animalTypes = animalsConfig.getAnimalsTypes();
+        IslandSimulationConfig islandSimulationConfig = IslandSimulationConfig.getInstance();
         System.out.println("Configuration loaded");
         System.out.println("Creating an island...");
-        island = new Island(10, 10, animalTypes); ////todo, temporary hardcoded
+        island = new Island(
+                islandSimulationConfig.getIslandLength().getParallelLength(),
+                islandSimulationConfig.getIslandLength().getMeridianLength(),
+                animalTypes);
         System.out.println("The island created");
         System.out.println("Initialization...");
         island.initFields();
