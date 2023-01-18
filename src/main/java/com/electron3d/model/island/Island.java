@@ -7,17 +7,17 @@ import com.electron3d.model.creatures.Plant;
 import java.util.*;
 
 public class Island {
-    private final int parallelLength;
-    private final int meridianLength;
+    private final int xDimension;
+    private final int yDimension;
     private final Field[][] fields;
     private final List<String> animalTypes;
     private final List<Plant> plantsPull  = new ArrayList<>();
     private final List<Animal> animalsPull = new ArrayList<>();
 
-    public Island(int parallelLength, int meridianLength, List<String> animalTypes) {
-        this.parallelLength = parallelLength;
-        this.meridianLength = meridianLength;
-        this.fields = new Field[meridianLength][parallelLength];
+    public Island(int xDimension, int yDimension, List<String> animalTypes) {
+        this.xDimension = xDimension;
+        this.yDimension = yDimension;
+        this.fields = new Field[yDimension][xDimension];
         this.animalTypes = animalTypes;
     }
 
@@ -40,7 +40,7 @@ public class Island {
 
     private List<Plant> initPlants(Field field) {
         Random startingPlantsCountChooser = new Random();
-        field.setAmountOfPlantsOnTheField(startingPlantsCountChooser.nextInt(Plant.BOUND_ON_THE_SAME_FIELD));
+        field.setAmountOfPlantsOnTheField(startingPlantsCountChooser.nextInt(Plant.BOUND_ON_THE_SAME_FIELD)); //todo replace with getPlantsPullSize();
         List<Plant> plantsOnTheField = new ArrayList<>();
         for (int i = 0; i < field.getAmountOfPlantsOnTheField(); i++) {
             plantsOnTheField.add(new Plant(field));
@@ -88,7 +88,18 @@ public class Island {
                 newGrownPlants.add(new Plant(plant.getLocation()));
             }
         }
-        plantsPull.addAll(newGrownPlants);
+        addPlants(newGrownPlants);
+    }
+
+    public int getPlantsPullSize() {
+        return plantsPull.size();
+    }
+
+    public synchronized void addPlants(List<Plant> newGrownPlantsToAdd) {
+        plantsPull.addAll(newGrownPlantsToAdd);
+    }
+    public synchronized boolean deletePlant(Plant plantToDelete) {
+        return plantsPull.remove(plantToDelete);
     }
 
     public void doAnimalStuff() {
@@ -97,12 +108,16 @@ public class Island {
         }
     }
 
-    public List<Plant> getPlantsPull() {
-        return plantsPull;
+    public int getAnimalsPullSize() {
+        return animalsPull.size();
     }
 
-    public List<Animal> getAnimalsPull() {
-        return animalsPull;
+    public synchronized void addAnimal(Animal animalToAdd) {
+        animalsPull.add(animalToAdd);
+    }
+
+    public synchronized boolean deleteAnimal(Animal animalToDelete) {
+        return animalsPull.remove(animalToDelete);
     }
 
     @Override
@@ -124,8 +139,8 @@ public class Island {
             fieldsToString.append("\n");
         }
         return "Island\n{" +
-                "parallelLength=" + parallelLength +
-                ", meridianLength=" + meridianLength +
+                "parallelLength=" + xDimension +
+                ", meridianLength=" + yDimension +
                 ", fields=\n" + fieldsToString +
                 "}";
     }

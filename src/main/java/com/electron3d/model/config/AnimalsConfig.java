@@ -2,8 +2,12 @@ package com.electron3d.model.config;
 
 import com.electron3d.model.creatures.AnimalProperties;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class AnimalsConfig extends Config {
@@ -45,7 +49,16 @@ public class AnimalsConfig extends Config {
 
         @Override
         protected List<String> readLinesFromCsv() {
-            return new ArrayList<>();//todo
+            List<String> lines = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader(Objects.requireNonNull(this.getClass().getResource("/" + ANIMALS_SPECS_FILE_NAME)).getPath()))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    lines.add(line);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return lines;
         }
 
         private List<String> getAnimalsNamesFrom(List<String> lines) {

@@ -18,8 +18,8 @@ public class IslandSimulation implements Simulation {
         System.out.println("Configuration loaded");
         System.out.println("Creating an island...");
         island = new Island(
-                islandSimulationConfig.getIslandLength().getParallelLength(),
-                islandSimulationConfig.getIslandLength().getMeridianLength(),
+                islandSimulationConfig.getIslandDimensions().getXDimension(),
+                islandSimulationConfig.getIslandDimensions().getYDimension(),
                 animalTypes);
         System.out.println("The island created");
         System.out.println("Initialization...");
@@ -35,7 +35,7 @@ public class IslandSimulation implements Simulation {
         System.out.println("Plants are growing");
         island.growPlants();
 
-        System.out.println("Animals living");
+        System.out.println("Animals are living");
         island.doAnimalStuff();
 
         System.out.println("Results are printing");
@@ -49,7 +49,7 @@ public class IslandSimulation implements Simulation {
     @Override
     public void printSimulationResults() {
         System.out.println(island);
-        System.out.println(island.getPlantsPull().size());
-        System.out.println(island.getAnimalsPull().size());
+        System.out.println("Plants total: " + island.getPlantsPullSize());
+        System.out.println("Animals total: " + island.getAnimalsPullSize());
     }
 }

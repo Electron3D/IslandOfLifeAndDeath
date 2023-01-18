@@ -44,14 +44,14 @@ public abstract class Animal {
     }
 
     private void die() {
+        //todo add starvation mechanic
     }
 
     public void eat(Eatable food) {
-
     }
 
     public void breed() {
-
+        //todo add mechanic of growing up
     }
 
     public void walk() {
@@ -64,6 +64,7 @@ public abstract class Animal {
     }
 
     private void changeLocation(Field destinationField) {
+
     }
 
     public Field getLocation() {

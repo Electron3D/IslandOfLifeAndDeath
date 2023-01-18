@@ -16,7 +16,7 @@ public class SimulationEngine {
 
     public void start() {
         simulation.init();
-        System.out.println("Starting config:");
+        System.out.println("Starting condition:");
         simulation.printSimulationResults();
         System.out.println();
         System.out.println();
@@ -32,7 +32,6 @@ public class SimulationEngine {
             }
         }
         System.out.println("Time is over! Final results:");
-        System.out.println("Results are printing");
         simulation.printSimulationResults();
     }
 }

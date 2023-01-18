@@ -6,7 +6,7 @@ public class IslandSimulationConfig extends Config {
     private static IslandSimulationConfig INSTANCE;
     private int speedOfSimulation;
     private int maxTimer;
-    private final IslandLength islandLength = new IslandLength();
+    private final IslandDimensions islandDimensions = new IslandDimensions();
     public static IslandSimulationConfig getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new SimulationConfigBuilder<>(new IslandSimulationConfig()).buildAndGetConfig();
@@ -33,20 +33,20 @@ public class IslandSimulationConfig extends Config {
         this.maxTimer = maxTimer;
     }
 
-    public IslandLength getIslandLength() {
-        return islandLength;
+    public IslandDimensions getIslandDimensions() {
+        return islandDimensions;
     }
 
-    public static class IslandLength {
-        int parallelLength;
-        int meridianLength;
-        public IslandLength() {
+    public static class IslandDimensions {
+        int xDimension;
+        int yDimension;
+        public IslandDimensions() {
         }
-        public int getParallelLength() {
-            return parallelLength;
+        public int getXDimension() {
+            return xDimension;
         }
-        public int getMeridianLength() {
-            return meridianLength;
+        public int getYDimension() {
+            return yDimension;
         }
     }
 
@@ -61,7 +61,7 @@ public class IslandSimulationConfig extends Config {
         protected void initFieldsFromSourceFile() {
             List<String> lines = readLinesFromCsv();
             setupSimulationParameters(lines);
-            setupIslandLength(lines);
+            setupIslandDimensions(lines);
         }
 
         @Override
@@ -74,11 +74,11 @@ public class IslandSimulationConfig extends Config {
             //todo
         }
 
-        private void setupIslandLength(List<String> lines) {
-            IslandLength length = toReturn.getIslandLength();
+        private void setupIslandDimensions(List<String> lines) {
+            IslandDimensions dimensions = toReturn.getIslandDimensions();
             //todo
-            length.meridianLength = 10;
-            length.parallelLength = 10;
+            dimensions.yDimension = 10;
+            dimensions.xDimension = 10;
         }
         @Override
         public T buildAndGetConfig() {
