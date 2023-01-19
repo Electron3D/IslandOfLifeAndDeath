@@ -25,5 +25,11 @@ public abstract class ConfigBuilder<Config> {
         }
         return lines;
     }
+
+    //todo
+    protected List<String> readLinesFromJSON(String configFileName) {
+        List<String> lines = new ArrayList<>();
+        return lines;
+    }
     public abstract Config buildAndGetConfig();
 }
