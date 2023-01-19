@@ -4,14 +4,14 @@ import com.electron3d.model.Simulation;
 
 public class SimulationEngine {
     private final Simulation simulation;
-    private final int speed;
-    private final int maxTimer;
+    private final int timeMultiplier;
+    private final int maxTimeOfSimulationInSeconds;
     private int timer;
 
-    public SimulationEngine(Simulation simulation, int speed, int maxTimer) {
+    public SimulationEngine(Simulation simulation, int timeMultiplier, int maxTimeOfSimulationInSeconds) {
         this.simulation = simulation;
-        this.speed = speed;
-        this.maxTimer = maxTimer;
+        this.timeMultiplier = timeMultiplier;
+        this.maxTimeOfSimulationInSeconds = maxTimeOfSimulationInSeconds;
     }
 
     public void start() {
@@ -22,11 +22,11 @@ public class SimulationEngine {
         System.out.println();
         System.out.println();
 
-        while (timer != maxTimer * 60) {
+        while (timer != maxTimeOfSimulationInSeconds) {
             System.out.println("Day: " + ++timer);
             simulation.simulate();
             try {
-                Thread.sleep(10000 / speed);
+                Thread.sleep(1000 / timeMultiplier);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

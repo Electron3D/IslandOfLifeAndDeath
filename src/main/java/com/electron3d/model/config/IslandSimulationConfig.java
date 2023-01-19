@@ -4,8 +4,8 @@ import java.util.List;
 
 public class IslandSimulationConfig extends Config {
     private static IslandSimulationConfig INSTANCE;
-    private int speedOfSimulation;
-    private int maxTimer;
+    private int timeMultiplier;
+    private int maxTimeOfSimulationInSeconds;
     private final IslandDimensions islandDimensions = new IslandDimensions();
     public static IslandSimulationConfig getInstance() {
         if (INSTANCE == null) {
@@ -17,20 +17,20 @@ public class IslandSimulationConfig extends Config {
     private IslandSimulationConfig() {
     }
 
-    public int getSpeedOfSimulation() {
-        return speedOfSimulation;
+    public int getTimeMultiplier() {
+        return timeMultiplier;
     }
 
-    public void setSpeedOfSimulation(int speedOfSimulation) {
-        this.speedOfSimulation = speedOfSimulation;
+    public void setTimeMultiplierOfSimulation(int speedOfSimulation) {
+        this.timeMultiplier = speedOfSimulation;
     }
 
-    public int getMaxTimer() {
-        return maxTimer;
+    public int getMaxTimeOfSimulationInSeconds() {
+        return maxTimeOfSimulationInSeconds;
     }
 
-    public void setMaxTimer(int maxTimer) {
-        this.maxTimer = maxTimer;
+    public void maxTimeOfSimulationInSeconds(int maxTimer) {
+        this.maxTimeOfSimulationInSeconds = maxTimer;
     }
 
     public IslandDimensions getIslandDimensions() {
@@ -50,6 +50,10 @@ public class IslandSimulationConfig extends Config {
         }
     }
 
+    /**
+     * Every Config.class realisation should have its own builder in it extended from ConfigBuilder.class.
+     * There is an example of Config "toReturn" that Builder should configure, initialise fields, check validation and then return.
+     **/
     private static class SimulationConfigBuilder<T extends IslandSimulationConfig> extends ConfigBuilder<T> {
         private static final String SIMULATION_SPEC_FILE_NAME = "simulationCfg.csv";
 
@@ -59,19 +63,15 @@ public class IslandSimulationConfig extends Config {
 
         @Override
         protected void initFieldsFromSourceFile() {
-            List<String> lines = readLinesFromCsv();
+            List<String> lines = readLinesFromCsv(SIMULATION_SPEC_FILE_NAME);
             setupSimulationParameters(lines);
             setupIslandDimensions(lines);
         }
 
-        @Override
-        protected List<String> readLinesFromCsv() {
-            //todo
-            return null;
-        }
-
         private void setupSimulationParameters(List<String> lines) {
             //todo
+            toReturn.maxTimeOfSimulationInSeconds(30);
+            toReturn.setTimeMultiplierOfSimulation(4);
         }
 
         private void setupIslandDimensions(List<String> lines) {
@@ -83,7 +83,7 @@ public class IslandSimulationConfig extends Config {
         @Override
         public T buildAndGetConfig() {
             //todo build an object and check validation
-
+            initFieldsFromSourceFile();
             return toReturn;
         }
     }

@@ -10,23 +10,23 @@ import java.util.List;
 public class AnimalFactory {
     public Animal createAnimal(String animalType, Field location) {
         List<AnimalProperties> allProperties = AnimalsConfig.getInstance().getAnimalsProperties();
-        return switch (animalType) {
-            case "Boar" -> new Boar(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Buffalo" -> new Buffalo(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Caterpillar" -> new Caterpillar(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Deer" -> new Deer(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Duck" -> new Duck(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Goat" -> new Goat(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Horse" -> new Horse(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Mouse" -> new Mouse(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Rabbit" -> new Rabbit(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Sheep" -> new Sheep(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Bear" -> new Bear(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Eagle" -> new Eagle(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Fox" -> new Fox(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Python" -> new Python(getAnimalPropertiesForType(animalType, allProperties), location);
-            case "Wolf" -> new Wolf(getAnimalPropertiesForType(animalType, allProperties), location);
-            default -> throw new RuntimeException();
+        return switch (animalType.toLowerCase()) {
+            case "boar" -> new Boar(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "buffalo" -> new Buffalo(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "caterpillar" -> new Caterpillar(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "deer" -> new Deer(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "duck" -> new Duck(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "goat" -> new Goat(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "horse" -> new Horse(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "mouse" -> new Mouse(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "rabbit" -> new Rabbit(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "sheep" -> new Sheep(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "bear" -> new Bear(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "eagle" -> new Eagle(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "fox" -> new Fox(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "python" -> new Python(getAnimalPropertiesForType(animalType, allProperties), location);
+            case "wolf" -> new Wolf(getAnimalPropertiesForType(animalType, allProperties), location);
+            default -> throw new RuntimeException("Unknown type of animal");
         };
     }
 

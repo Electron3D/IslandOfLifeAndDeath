@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Every Config.class realisation should have its own builder in it extended from ConfigBuilder.class.
+ */
 public class AnimalsConfig extends Config {
     private static AnimalsConfig INSTANCE;
     private final List<String> animalsTypes = new ArrayList<>();
@@ -33,6 +36,10 @@ public class AnimalsConfig extends Config {
         return animalsProperties;
     }
 
+    /**
+     * There is an example of Config "toReturn" that Builder should configure,
+     * initialise fields, check validation and then return.
+     **/
     private static class AnimalsConfigBuilder<T extends AnimalsConfig> extends ConfigBuilder<T> {
         private static final String ANIMALS_SPECS_FILE_NAME = "animalsSpecs.csv";
 
@@ -42,23 +49,9 @@ public class AnimalsConfig extends Config {
 
         @Override
         protected void initFieldsFromSourceFile() {
-            List<String> lines = readLinesFromCsv();
+            List<String> lines = readLinesFromCsv(ANIMALS_SPECS_FILE_NAME);
             toReturn.getAnimalsTypes().addAll(getAnimalsNamesFrom(lines));
             toReturn.getAnimalsProperties().addAll(getAllAnimalPropertiesFrom(lines));
-        }
-
-        @Override
-        protected List<String> readLinesFromCsv() {
-            List<String> lines = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader(Objects.requireNonNull(this.getClass().getResource("/" + ANIMALS_SPECS_FILE_NAME)).getPath()))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    lines.add(line);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return lines;
         }
 
         private List<String> getAnimalsNamesFrom(List<String> lines) {
@@ -66,14 +59,16 @@ public class AnimalsConfig extends Config {
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
                 String name = getName(line);
-                animalsNames.add(name);
+                if (!("plant".equalsIgnoreCase(name))) {
+                    animalsNames.add(name);
+                }
             }
             return animalsNames;
         }
 
         private List<AnimalProperties> getAllAnimalPropertiesFrom(List<String> lines) {
             String[] animalPropertiesNames = getHeader(lines).split(",");
-            return lines.subList(1, lines.size()).stream().map(line -> {
+            return lines.subList(1, lines.size()).stream().filter(x -> !(x.startsWith("plant"))).map(line -> {
                 String type = "";
                 double weight = -1;
                 int range = -1;
