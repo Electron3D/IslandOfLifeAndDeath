@@ -40,9 +40,9 @@ public class Island {
 
     private List<Plant> initPlants(Field field) {
         Random startingPlantsCountChooser = new Random();
-        field.setAmountOfPlantsOnTheField(startingPlantsCountChooser.nextInt(Plant.BOUND_ON_THE_SAME_FIELD)); //todo replace with getPlantsPullSize();
+        int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(Plant.BOUND_ON_THE_SAME_FIELD);
         List<Plant> plantsOnTheField = new ArrayList<>();
-        for (int i = 0; i < field.getAmountOfPlantsOnTheField(); i++) {
+        for (int i = 0; i < amountOfPlantsOnTheField; i++) {
             plantsOnTheField.add(new Plant(field));
         }
         plantsPull.addAll(plantsOnTheField);
@@ -84,7 +84,7 @@ public class Island {
     public void growPlants() {
         List<Plant> newGrownPlants = new ArrayList<>();
         for (Plant plant : plantsPull) {
-            if (plant.grow()) {
+            for (int i = 0; i < plant.grow(); i++) {
                 newGrownPlants.add(new Plant(plant.getLocation()));
             }
         }
@@ -130,6 +130,9 @@ public class Island {
                     fieldsToString.append(" ");
                 }
                 if (field.getY() < 10) {
+                    fieldsToString.append(" ");
+                }
+                if (field.getAmountOfPlantsOnTheField() < 10) {
                     fieldsToString.append(" ");
                 }
                 if (field.getAmountOfPlantsOnTheField() < 100) {

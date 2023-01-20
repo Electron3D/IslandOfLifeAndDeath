@@ -17,7 +17,6 @@ public class Field {
     public final List<Field> possibleWays = new ArrayList<>();
     private final int x;
     private final int y;
-    private int amountOfPlantsOnTheField;
 
     public Field(int x, int y) {
         this.x = x;
@@ -33,15 +32,11 @@ public class Field {
     }
 
     public int getAmountOfPlantsOnTheField() {
-        return amountOfPlantsOnTheField;
-    }
-
-    public void setAmountOfPlantsOnTheField(int amountOfPlantsOnTheField) {
-        this.amountOfPlantsOnTheField = amountOfPlantsOnTheField;
+        return plantsOnTheField.size();
     }
 
     @Override
     public String toString() {
-        return "{" + x + "," + y + "|plants:" + amountOfPlantsOnTheField + "|animals:" + amountOfAnimalsOnTheField.values().stream().reduce(Integer::sum).orElseThrow() + "}"; //todo
+        return "{" + x + "," + y + "|plants:" + getAmountOfPlantsOnTheField() + "|animals:" + amountOfAnimalsOnTheField.values().stream().reduce(Integer::sum).orElseThrow() + "}"; //todo
     }
 }

@@ -19,18 +19,18 @@ public class Plant implements Eatable {
         this.location = location;
     }
 
-    public boolean grow() {
+    public int grow() {
         int amount = location.getAmountOfPlantsOnTheField();
         if (amount > 0 && amount < BOUND_ON_THE_SAME_FIELD) {
             Random random = new Random();
             int newPlantsNum = random.nextInt(0, 2);
             if (newPlantsNum == 0) {
-                return false;
+                return newPlantsNum;
             }
-            location.setAmountOfPlantsOnTheField(amount + newPlantsNum);
-            return true;
+            //todo
+            return 1;
         } else {
-            return false;
+            return 0;
         }
     }
 
