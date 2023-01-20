@@ -1,8 +1,10 @@
 package com.electron3d.model.island;
 
+import com.electron3d.model.config.AnimalsConfig;
 import com.electron3d.model.creatures.Animal;
 import com.electron3d.model.creatures.AnimalFactory;
 import com.electron3d.model.creatures.Plant;
+import com.electron3d.model.creatures.PlantProperties;
 
 import java.util.*;
 
@@ -40,10 +42,11 @@ public class Island {
 
     private List<Plant> initPlants(Field field) {
         Random startingPlantsCountChooser = new Random();
-        int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(Plant.BOUND_ON_THE_SAME_FIELD);
+        PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
+        int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(properties.getBoundOnTheSameField());
         List<Plant> plantsOnTheField = new ArrayList<>();
         for (int i = 0; i < amountOfPlantsOnTheField; i++) {
-            plantsOnTheField.add(new Plant(field));
+            plantsOnTheField.add(new Plant(properties, field));
         }
         plantsPull.addAll(plantsOnTheField);
         return plantsOnTheField;
@@ -83,9 +86,12 @@ public class Island {
 
     public void growPlants() {
         List<Plant> newGrownPlants = new ArrayList<>();
+        PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
         for (Plant plant : plantsPull) {
-            for (int i = 0; i < plant.grow(); i++) {
-                newGrownPlants.add(new Plant(plant.getLocation()));
+            int numberOfNewGrownPlants = plant.grow();
+            for (int i = 0; i < numberOfNewGrownPlants; i++) {
+                newGrownPlants.add(new Plant(properties, plant.getLocation()));
+                //todo почему-то добавляет слишком много растений plantsPull
             }
         }
         addPlants(newGrownPlants);

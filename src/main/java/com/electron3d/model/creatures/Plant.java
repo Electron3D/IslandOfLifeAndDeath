@@ -5,30 +5,26 @@ import com.electron3d.model.island.Field;
 import java.util.Random;
 
 public class Plant implements Eatable {
-    public static final int BOUND_ON_THE_SAME_FIELD;
-    private static final double WEIGHT;
+    private final PlantProperties properties;
     private final Field location;
 
-    //todo config initializer
-    static {
-        BOUND_ON_THE_SAME_FIELD = 200;
-        WEIGHT = 1;
-    }
-
-    public Plant(Field location) {
+    public Plant(PlantProperties properties, Field location) {
+        this.properties = properties;
         this.location = location;
     }
 
     public int grow() {
+        int boundOnTheSameField = properties.getBoundOnTheSameField();
         int amount = location.getAmountOfPlantsOnTheField();
-        if (amount > 0 && amount < BOUND_ON_THE_SAME_FIELD) {
+        if (amount > 0 && amount < boundOnTheSameField) {
             Random random = new Random();
-            int newPlantsNum = random.nextInt(0, 2);
-            if (newPlantsNum == 0) {
-                return newPlantsNum;
+            int numberOfNewGrownPlants = random.nextInt(0, 2);
+            int newAmount = amount + numberOfNewGrownPlants;
+            if (newAmount >= boundOnTheSameField) {
+                return boundOnTheSameField - amount;
+            } else {
+                return numberOfNewGrownPlants;
             }
-            //todo
-            return 1;
         } else {
             return 0;
         }
@@ -36,7 +32,7 @@ public class Plant implements Eatable {
 
     @Override
     public double restoreHP() {
-        return WEIGHT;
+        return properties.getWeight();
     }
 
     public Field getLocation() {

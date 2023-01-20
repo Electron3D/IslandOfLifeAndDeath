@@ -1,26 +1,26 @@
 package com.electron3d.model.config;
 
 import com.electron3d.model.creatures.AnimalProperties;
+import com.electron3d.model.creatures.PlantProperties;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Every Config.class realisation should have its own builder in it extended from ConfigBuilder.class.
+ * Every Config class inheritor should have its own builder as inner class in it extended from ConfigBuilder class.
  */
 public class AnimalsConfig extends Config {
     private static AnimalsConfig INSTANCE;
     private final List<String> animalsTypes = new ArrayList<>();
     private final List<AnimalProperties> animalsProperties = new ArrayList<>();
+    private PlantProperties plantProperties;
 
     public static AnimalsConfig getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new AnimalsConfigBuilder<>(new AnimalsConfig()).buildAndGetConfig();
+            AnimalsConfigBuilder<AnimalsConfig> animalsConfigBuilder = new AnimalsConfigBuilder<>(new AnimalsConfig());
+            INSTANCE = animalsConfigBuilder.buildAndGetConfig();
+            INSTANCE.setPlantProperties(animalsConfigBuilder.getPlantProperties());
         }
         return INSTANCE;
     }
@@ -36,12 +36,21 @@ public class AnimalsConfig extends Config {
         return animalsProperties;
     }
 
+    public PlantProperties getPlantProperties() {
+        return plantProperties;
+    }
+
+    private void setPlantProperties(PlantProperties plantProperties) {
+        this.plantProperties = plantProperties;
+    }
+
     /**
      * There is an example of Config "toReturn" that Builder should configure,
      * initialise fields, check validation and then return.
      **/
     private static class AnimalsConfigBuilder<T extends AnimalsConfig> extends ConfigBuilder<T> {
         private static final String ANIMALS_SPECS_FILE_NAME = "animalsSpecs.csv";
+        private PlantProperties plantProperties;
 
         public AnimalsConfigBuilder(T animalsConfig) {
             this.toReturn = animalsConfig;
@@ -50,20 +59,41 @@ public class AnimalsConfig extends Config {
         @Override
         protected void initFieldsFromSourceFile() {
             List<String> lines = readLinesFromCsv(ANIMALS_SPECS_FILE_NAME);
-            toReturn.getAnimalsTypes().addAll(getAnimalsNamesFrom(lines));
+            toReturn.getAnimalsTypes().addAll(getAnimalsTypesFrom(lines));
             toReturn.getAnimalsProperties().addAll(getAllAnimalPropertiesFrom(lines));
         }
 
-        private List<String> getAnimalsNamesFrom(List<String> lines) {
+        private List<String> getAnimalsTypesFrom(List<String> lines) {
             List<String> animalsNames = new ArrayList<>();
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
-                String name = getName(line);
-                if (!("plant".equalsIgnoreCase(name))) {
-                    animalsNames.add(name);
+                String type = getType(line);
+                if (isPlant(type)) {
+                    setPlantProperties(line);
+                } else {
+                    animalsNames.add(type);
                 }
             }
             return animalsNames;
+        }
+
+        private void setPlantProperties(String line) {
+            String[] values = line.split(",");
+            double weight = Double.parseDouble(values[1]);
+            int boundOnTheSameField = Integer.parseInt(values[2]);
+            plantProperties = new PlantProperties(weight, boundOnTheSameField);
+        }
+
+        private PlantProperties getPlantProperties() {
+            return plantProperties;
+        }
+
+        private String getType(String line) {
+            return line.split(",")[0];
+        }
+
+        private boolean isPlant(String type) {
+            return "plant".equalsIgnoreCase(type);
         }
 
         private List<AnimalProperties> getAllAnimalPropertiesFrom(List<String> lines) {
@@ -89,10 +119,6 @@ public class AnimalsConfig extends Config {
             }).collect(Collectors.toList());
         }
 
-        private String getName(String line) {
-            return line.split(",")[0];
-        }
-
         private String getHeader(List<String> lines) {
             return lines.get(0);
         }
@@ -103,6 +129,5 @@ public class AnimalsConfig extends Config {
             //todo check validation
             return toReturn;
         }
-
     }
 }
