@@ -26,31 +26,7 @@ public abstract class Animal {
 
     public Map<String, Boolean> liveADay() {
         Map<String, Boolean> resultsOfTheDay = new HashMap<>();
-        int numberOfStepsLeft = properties.getRange();
-        boolean isSatisfied = false;
-        double currentSatisfactionLevel = 0.0;
-        while (true) {
-            try {
-                int attemptsToEat = 0;
-                while (attemptsToEat != 3) {
-                    currentSatisfactionLevel = currentSatisfactionLevel + satisfyNeeds();
-                    attemptsToEat++;
-                    if (currentSatisfactionLevel > properties.getAmountOfFoodToBeFull() / 2) {
-                        isSatisfied = true;
-                        break;
-                    }
-                }
-                break;
-            } catch (NoSuchElementException e) {
-                if (numberOfStepsLeft == 0) {
-                    break;
-                } else {
-                    chooseDirection();
-                    walk();
-                    numberOfStepsLeft--;
-                }
-            }
-        }
+        boolean isSatisfied = satisfyNeeds();
         if (isSatisfied) {
             if (isAdult) {
                 resultsOfTheDay.put("breedSucceed", breed());
@@ -71,7 +47,35 @@ public abstract class Animal {
         return resultsOfTheDay;
     }
 
-    private double satisfyNeeds() throws NoSuchElementException {
+    private boolean satisfyNeeds() {
+        int numberOfStepsLeft = properties.getRange();
+        boolean isSatisfied = false;
+        double currentSatisfactionLevel = 0.0;
+        while (true) {
+            try {
+                int attemptsToEat = 0;
+                while (attemptsToEat != 3) {
+                    currentSatisfactionLevel = currentSatisfactionLevel + tryToBeSatisfyingByEating();
+                    attemptsToEat++;
+                    if (currentSatisfactionLevel > properties.getAmountOfFoodToBeFull() / 2) {
+                        isSatisfied = true;
+                        break;
+                    }
+                }
+                break;
+            } catch (NoSuchElementException e) {
+                if (numberOfStepsLeft == 0) {
+                    break;
+                } else {
+                    walk(chooseDirection());
+                    numberOfStepsLeft--;
+                }
+            }
+        }
+        return isSatisfied;
+    }
+
+    private double tryToBeSatisfyingByEating() throws NoSuchElementException {
         double currentSatisfactionLevel = 0;
         if (this instanceof HerbivoresAndCaterpillarEatingAnimal) {
             Random random = new Random();
@@ -109,19 +113,14 @@ public abstract class Animal {
         return 1.0;
     }
 
-    public void walk() {
-        Field destinationField = chooseDirection();
-        changeLocation(destinationField);
+    public void walk(Field destinationField) {
+        //todo
     }
 
     private Field chooseDirection() {
         return location.possibleWays.stream()
                 .filter(x -> Stream.concat(x.animalsOnTheField.stream(), x.plantsOnTheField.stream()).anyMatch(y -> y instanceof Eatable))
                 .findAny().orElseThrow();
-    }
-
-    private void changeLocation(Field destinationField) {
-        //todo
     }
 
     private boolean die() {
