@@ -2,6 +2,9 @@ package com.electron3d.model.config;
 
 import java.util.List;
 
+/**
+ * Every Config class inheritor should have its own builder as inner class in it extended from ConfigBuilder class.
+ */
 public class IslandSimulationConfig extends Config {
     private static IslandSimulationConfig INSTANCE;
     private int timeMultiplier;
@@ -51,8 +54,8 @@ public class IslandSimulationConfig extends Config {
     }
 
     /**
-     * Every Config.class realisation should have its own builder in it extended from ConfigBuilder.class.
-     * There is an example of Config "toReturn" that Builder should configure, initialise fields, check validation and then return.
+     * There is an example of Config "toReturn" that Builder should configure,
+     * initialise fields, check validation and then return.
      **/
     private static class SimulationConfigBuilder<T extends IslandSimulationConfig> extends ConfigBuilder<T> {
         private static final String SIMULATION_SPEC_FILE_NAME = "simulationCfg.csv";

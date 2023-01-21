@@ -7,7 +7,4 @@ public abstract class HerbivoresAndCaterpillarEatingAnimal extends HerbivoresAni
     public HerbivoresAndCaterpillarEatingAnimal(AnimalProperties properties, Field location) {
         super(properties, location);
     }
-
-    public void accidentallyEatCaterpillar() {
-    }
 }

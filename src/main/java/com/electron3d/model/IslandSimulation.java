@@ -51,5 +51,6 @@ public class IslandSimulation implements Simulation {
         System.out.println(island);
         System.out.println("Plants total: " + island.getPlantsPullSize());
         System.out.println("Animals total: " + island.getAnimalsPullSize());
+        System.out.println("Animals died: " + island.getGraveYardSize());
     }
 }

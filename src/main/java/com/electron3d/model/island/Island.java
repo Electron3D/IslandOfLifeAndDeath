@@ -1,10 +1,7 @@
 package com.electron3d.model.island;
 
 import com.electron3d.model.config.AnimalsConfig;
-import com.electron3d.model.creatures.Animal;
-import com.electron3d.model.creatures.AnimalFactory;
-import com.electron3d.model.creatures.Plant;
-import com.electron3d.model.creatures.PlantProperties;
+import com.electron3d.model.creatures.*;
 
 import java.util.*;
 
@@ -15,6 +12,7 @@ public class Island {
     private final List<String> animalTypes;
     private final List<Plant> plantsPull  = new ArrayList<>();
     private final List<Animal> animalsPull = new ArrayList<>();
+    private final List<Animal> graveYard = new ArrayList<>();
 
     public Island(int xDimension, int yDimension, List<String> animalTypes) {
         this.xDimension = xDimension;
@@ -54,8 +52,10 @@ public class Island {
 
     private List<Animal> initAnimals(Field field) {
         Random startingAnimalsCountChooser = new Random();
+        List<AnimalProperties> animalsProperties = AnimalsConfig.getInstance().getAnimalsProperties();
         for (String animalType : animalTypes) {
-            field.amountOfAnimalsOnTheField.put(animalType, startingAnimalsCountChooser.nextInt(10)); //todo add bound from config
+            AnimalProperties animalProperties = animalsProperties.stream().filter(x -> animalType.equals(x.getType())).findFirst().orElseThrow();
+            field.amountOfAnimalsOnTheField.put(animalType, startingAnimalsCountChooser.nextInt(animalProperties.getBoundOnTheSameField()));
         }
         AnimalFactory factory = new AnimalFactory();
         List<Animal> animalsOnTheField = new ArrayList<>();
@@ -68,6 +68,7 @@ public class Island {
         animalsPull.addAll(animalsOnTheField);
         return animalsOnTheField;
     }
+
     private List<Field> initPossibleWays(Field field) {
         List<Field> possibleWays = new ArrayList<>();
         int i0 = field.getX();
@@ -83,47 +84,74 @@ public class Island {
         }
         return possibleWays;
     }
-
     public void growPlants() {
-        List<Plant> newGrownPlants = new ArrayList<>();
         PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
-        for (Plant plant : plantsPull) {
+        for (int i = 0; i < plantsPull.size(); i++) {
+            Plant plant = plantsPull.get(i);
+            List<Plant> newGrownPlants = new ArrayList<>();
             int numberOfNewGrownPlants = plant.grow();
-            for (int i = 0; i < numberOfNewGrownPlants; i++) {
-                newGrownPlants.add(new Plant(properties, plant.getLocation()));
-                //todo почему-то добавляет слишком много растений plantsPull
+            Field location = plant.getLocation();
+            for (int j = 0; j < numberOfNewGrownPlants; j++) {
+                newGrownPlants.add(new Plant(properties, location));
             }
+            addPlants(newGrownPlants, location);
         }
-        addPlants(newGrownPlants);
-    }
-
-    public int getPlantsPullSize() {
-        return plantsPull.size();
-    }
-
-    public synchronized void addPlants(List<Plant> newGrownPlantsToAdd) {
-        plantsPull.addAll(newGrownPlantsToAdd);
-    }
-    public synchronized boolean deletePlant(Plant plantToDelete) {
-        return plantsPull.remove(plantToDelete);
     }
 
     public void doAnimalStuff() {
+        List<Animal> diedAnimalsToday = new ArrayList<>();
         for (Animal animal : animalsPull) {
-            animal.liveADay();
+            boolean diedThisDay = animal.liveADay();
+            if (diedThisDay) {
+                diedAnimalsToday.add(animal);
+            }
         }
+        buryAnimals(diedAnimalsToday);
+    }
+
+    private void buryAnimals(List<Animal> diedAnimalsToday) {
+        for (Animal deadAnimal : diedAnimalsToday) {
+            deleteAnimal(deadAnimal, deadAnimal.getLocation());
+        }
+        graveYard.addAll(diedAnimalsToday);
     }
 
     public int getAnimalsPullSize() {
         return animalsPull.size();
     }
 
+    public int getPlantsPullSize() {
+        return plantsPull.size();
+    }
+
+    public int getGraveYardSize() {
+        return graveYard.size();
+    }
+
+    public void addPlants(List<Plant> newGrownPlantsToAdd, Field location) {
+        synchronized (location.plantsOnTheField) {
+            location.plantsOnTheField.addAll(newGrownPlantsToAdd);
+        }
+        synchronized (plantsPull) {
+            plantsPull.addAll(newGrownPlantsToAdd);
+        }
+    }
+
+    public synchronized boolean deletePlant(Plant plantToDelete) {
+        return plantsPull.remove(plantToDelete);
+    }
+
     public synchronized void addAnimal(Animal animalToAdd) {
         animalsPull.add(animalToAdd);
     }
 
-    public synchronized boolean deleteAnimal(Animal animalToDelete) {
-        return animalsPull.remove(animalToDelete);
+    public void deleteAnimal(Animal animalToDelete, Field location) {
+        synchronized (location.animalsOnTheField) {
+            location.animalsOnTheField.remove(animalToDelete);
+        }
+        synchronized (animalsPull) {
+            animalsPull.remove(animalToDelete);
+        }
     }
 
     @Override
