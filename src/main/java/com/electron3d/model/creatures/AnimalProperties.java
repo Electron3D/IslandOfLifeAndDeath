@@ -1,6 +1,6 @@
 package com.electron3d.model.creatures;
 
-public class AnimalProperties {
+public final class AnimalProperties {
     private final String type;
     private final double weight;
     private final int range;

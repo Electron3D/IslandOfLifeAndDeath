@@ -52,5 +52,7 @@ public class IslandSimulation implements Simulation {
         System.out.println("Plants total: " + island.getPlantsPullSize());
         System.out.println("Animals total: " + island.getAnimalsPullSize());
         System.out.println("Animals died: " + island.getGraveYardSize());
+        System.out.println("Were born " + island.getNewBornAnimalsCounter() + " animals in total.");
+        System.out.println("The oldest animal is: " + island.getTheOldestAnimal());
     }
 }

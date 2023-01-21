@@ -6,70 +6,97 @@ import com.electron3d.model.creatures.animals.PredatorAnimal;
 import com.electron3d.model.creatures.animals.herbivores.Caterpillar;
 import com.electron3d.model.island.Field;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public abstract class Animal {
     private final AnimalProperties properties;
     private Field location;
     private int starvation;
     private int daysAliveCounter;
+    private boolean isAdult;
 
     public Animal(AnimalProperties properties, Field location) {
         this.properties = properties;
         this.location = location;
     }
 
-    public boolean liveADay() {
+    public Map<String, Boolean> liveADay() {
+        Map<String, Boolean> resultsOfTheDay = new HashMap<>();
         int numberOfStepsLeft = properties.getRange();
         boolean isSatisfied = false;
         double currentSatisfactionLevel = 0.0;
-        while (!isSatisfied) {
+        while (true) {
             try {
-                currentSatisfactionLevel = currentSatisfactionLevel + satisfyNeeds();
+                int attemptsToEat = 0;
+                while (attemptsToEat != 3) {
+                    currentSatisfactionLevel = currentSatisfactionLevel + satisfyNeeds();
+                    attemptsToEat++;
+                    if (currentSatisfactionLevel > properties.getAmountOfFoodToBeFull() / 2) {
+                        isSatisfied = true;
+                        break;
+                    }
+                }
+                break;
             } catch (NoSuchElementException e) {
                 if (numberOfStepsLeft == 0) {
-                    if (starvation >= 7) {
-                        return die();
-                    } else {
-                        starvation++;
-                    }
                     break;
+                } else {
+                    chooseDirection();
+                    walk();
+                    numberOfStepsLeft--;
                 }
-                walk();
-                numberOfStepsLeft--;
-            }
-            if (currentSatisfactionLevel < properties.getAmountOfFoodToBeFull() / 2) {
-                isSatisfied = true;
             }
         }
         if (isSatisfied) {
-            breed();
+            if (isAdult) {
+                resultsOfTheDay.put("breedSucceed", breed());
+            } else {
+                resultsOfTheDay.put("breedSucceed", false);
+            }
+            resultsOfTheDay.put("diedThisDay", false);
+        } else {
+            resultsOfTheDay.put("breedSucceed", false);
+            if (starvation >= 7) {
+                resultsOfTheDay.put("diedThisDay", die());
+            } else {
+                resultsOfTheDay.put("diedThisDay", false);
+                starvation++;
+            }
         }
-        daysAliveCounter++;
-        return true;
+        growUp();
+        return resultsOfTheDay;
     }
 
     private double satisfyNeeds() throws NoSuchElementException {
         double currentSatisfactionLevel = 0;
         if (this instanceof HerbivoresAndCaterpillarEatingAnimal) {
-            //System.out.println("Я люблю гусениц и траву");
-            //todo addRandom
-            if (true) {
+            Random random = new Random();
+            if (random.nextInt(0, 2) == 1) { //todo add bound from config
                 currentSatisfactionLevel = eat((Eatable) location.animalsOnTheField.stream()
                         .filter(x -> x instanceof Caterpillar)
-                        .findAny().orElseThrow());
+                        .findAny()
+                        .orElseThrow());
             } else {
-                currentSatisfactionLevel = eat(location.plantsOnTheField.stream().findAny().orElseThrow());
+                currentSatisfactionLevel = eat(location.plantsOnTheField
+                        .stream()
+                        .findAny()
+                        .orElseThrow());
             }
         } else if (this instanceof PredatorAnimal) {
-            //System.out.println("Я хищник");
-            currentSatisfactionLevel = eat((Eatable) location.animalsOnTheField.stream()
+            currentSatisfactionLevel = eat((Eatable) location.animalsOnTheField
+                    .stream()
                     .filter(x -> x instanceof Eatable && x != this)
-                    .findAny().orElseThrow());
+                    .findAny()
+                    .orElseThrow());
         } else if (this instanceof HerbivoresAnimal) {
-            //System.out.println("Я травоядное");
-            currentSatisfactionLevel = eat(location.plantsOnTheField.stream().findAny().orElseThrow());
+            currentSatisfactionLevel = eat(location.plantsOnTheField
+                    .stream()
+                    .findAny()
+                    .orElseThrow());
         }
         return currentSatisfactionLevel;
     }
@@ -79,7 +106,7 @@ public abstract class Animal {
         // check chances and if success delete food,
         // check food.restoreHP() < this.properties.getAmountOfFoodToBeFull()
         // and return amount of eaten food
-        return 0.0;
+        return 1.0;
     }
 
     public void walk() {
@@ -88,7 +115,9 @@ public abstract class Animal {
     }
 
     private Field chooseDirection() {
-        return location.possibleWays.get(0); //todo add random factor or another logic
+        return location.possibleWays.stream()
+                .filter(x -> Stream.concat(x.animalsOnTheField.stream(), x.plantsOnTheField.stream()).anyMatch(y -> y instanceof Eatable))
+                .findAny().orElseThrow();
     }
 
     private void changeLocation(Field destinationField) {
@@ -97,23 +126,41 @@ public abstract class Animal {
 
     private boolean die() {
         Random dice = new Random();
-        int savingThrow = dice.nextInt(1,20);
+        int savingThrow = dice.nextInt(1, 21);
         if (savingThrow == 20) {
             starvation = 0;
-            System.out.println("Oh! This " + this.properties.getType() + " is the lucky one! You have a second chance to live! Starvation is fully satisfied now.");
+            //System.out.println("Oh! This " + this.properties.getType() + " is the lucky one! You have a second chance to live! Starvation is fully satisfied now.");
             return false;
         } else if (savingThrow > 10) {
             starvation--;
-            System.out.println("This " + this.properties.getType() + " can live one more day..");
+            //System.out.println("This " + this.properties.getType() + " can live one more day..");
             return false;
         } else {
-            System.out.println("Sorry, this animal is dead. Send a flower to it on its grave..");
+            //System.out.println("Sorry, this " + this.properties.getType() + " is dead. Send a flower to it on its grave..");
             return true;
         }
     }
 
-    public void breed() {
-        //todo add mechanic of growing up to start breeding
+    private boolean breed() {
+        int numberOfAnimalsSameType = location.amountOfAnimalsOnTheField.get(this.properties.getType());
+        if (numberOfAnimalsSameType < properties.getBoundOnTheSameField()) {
+            return location.animalsOnTheField.stream()
+                    .filter(a -> a.properties.getType().equals(this.properties.getType()))
+                    .filter(b -> b.isAdult)
+                    .count() > 2;
+        }
+        return false;
+    }
+
+    private void growUp() {
+        daysAliveCounter++;
+        if (daysAliveCounter > 7) {
+            isAdult = true;
+        }
+    }
+
+    public AnimalProperties getProperties() {
+        return properties;
     }
 
     public Field getLocation() {
@@ -126,5 +173,9 @@ public abstract class Animal {
 
     public int getDaysAliveCounter() {
         return daysAliveCounter;
+    }
+
+    public void setAdult(boolean adult) {
+        isAdult = adult;
     }
 }

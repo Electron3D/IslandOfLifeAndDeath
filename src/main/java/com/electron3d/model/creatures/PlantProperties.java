@@ -1,6 +1,6 @@
 package com.electron3d.model.creatures;
 
-public class PlantProperties {
+public final class PlantProperties {
     private final double weight;
     private final int boundOnTheSameField;
 
