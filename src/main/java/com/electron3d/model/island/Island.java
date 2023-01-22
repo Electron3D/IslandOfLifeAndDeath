@@ -10,11 +10,6 @@ public class Island {
     private final int yDimension;
     private final Field[][] fields;
     private final List<String> animalTypes;
-    private final List<Plant> plantsPull  = new ArrayList<>();
-    private final List<Animal> animalsPull = new ArrayList<>();
-    private final List<Animal> graveYard = new ArrayList<>();
-
-    private int newBornAnimalsCounter;
 
     public Island(int xDimension, int yDimension, List<String> animalTypes) {
         this.xDimension = xDimension;
@@ -28,8 +23,8 @@ public class Island {
             for (int x = 0; x < fields[y].length; x++) {
                 fields[y][x] = new Field(x, y);
                 Field field = fields[y][x];
-                field.plantsOnTheField.addAll(initPlants(field));
-                field.animalsOnTheField.addAll(initAnimals(field));
+                initPlants(field);
+                initAnimals(field);
             }
         }
         for (int y = 0; y < fields.length; y++) {
@@ -40,36 +35,29 @@ public class Island {
         }
     }
 
-    private List<Plant> initPlants(Field field) {
+    private void initPlants(Field field) {
         Random startingPlantsCountChooser = new Random();
         PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
         int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(properties.getBoundOnTheSameField() + 1);
-        List<Plant> plantsOnTheField = new ArrayList<>();
         for (int i = 0; i < amountOfPlantsOnTheField; i++) {
-            plantsOnTheField.add(new Plant(properties, field));
+            field.plantsOnTheField.add(new Plant(properties, field));
         }
-        plantsPull.addAll(plantsOnTheField);
-        return plantsOnTheField;
     }
 
-    private List<Animal> initAnimals(Field field) { //todo replace map in fields
+    private void initAnimals(Field field) {
         Random startingAnimalsCountChooser = new Random();
         List<AnimalProperties> animalsProperties = AnimalsConfig.getInstance().getAnimalsProperties();
+        AnimalFactory factory = new AnimalFactory();
         for (String animalType : animalTypes) {
             AnimalProperties animalProperties = animalsProperties.stream().filter(x -> animalType.equals(x.getType())).findFirst().orElseThrow();
-            field.amountOfAnimalsOnTheField.put(animalType, startingAnimalsCountChooser.nextInt(animalProperties.getBoundOnTheSameField() + 1));
-        }
-        AnimalFactory factory = new AnimalFactory();
-        List<Animal> animalsOnTheField = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : field.amountOfAnimalsOnTheField.entrySet()) {
-            for (int i = 0; i < entry.getValue(); i++) {
-                Animal animal = factory.createAnimal(entry.getKey(), field);
+            int startingAnimalsCount = startingAnimalsCountChooser.nextInt(animalProperties.getBoundOnTheSameField() + 1);
+            for (int i = 0; i < startingAnimalsCount; i++) {
+                Animal animal = factory.createAnimal(animalType, field);
                 animal.setAdult(true);
-                animalsOnTheField.add(animal);
+                field.animalsOnTheField.add(animal);
             }
+            field.amountOfAnimalsOnTheField.put(animalType, field.animalsOnTheField.size());
         }
-        animalsPull.addAll(animalsOnTheField);
-        return animalsOnTheField;
     }
 
     private List<Field> initPossibleWays(Field field) {
@@ -88,111 +76,51 @@ public class Island {
         return possibleWays;
     }
 
-    public void growPlants() {
-        PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
-        for (int i = 0; i < plantsPull.size(); i++) {
-            Plant plant = plantsPull.get(i);
-            List<Plant> newGrownPlants = new ArrayList<>();
-            int numberOfNewGrownPlants = plant.grow();
-            Field location = plant.getLocation();
-            for (int j = 0; j < numberOfNewGrownPlants; j++) {
-                newGrownPlants.add(new Plant(properties, location));
-            }
-            addPlants(newGrownPlants, location);
-        }
-    }
-    public void doAnimalStuff() {
-        List<Animal> diedAnimalsToday = new ArrayList<>();
-        List<Animal> newBornAnimalsToday = new ArrayList<>();
-        for (Animal animal : animalsPull) {
-            Map<String, Boolean> resultsOfTheDay = animal.liveADay();
-            boolean diedThisDay = resultsOfTheDay.get("diedThisDay");
-            boolean breedSucceed = resultsOfTheDay.get("breedSucceed");
-            if (diedThisDay) {
-                diedAnimalsToday.add(animal);
-            }
-            if (breedSucceed) {
-                AnimalFactory factory = new AnimalFactory();
-                Animal animalToAdd = factory.createAnimal(animal.getProperties().getType(), animal.getLocation());
-                newBornAnimalsToday.add(animalToAdd);
+    public void live() {
+        for (int y = 0; y < fields.length; y++) {
+            for (int x = 0; x < fields[y].length; x++) {
+                Field field = fields[y][x];
+                field.growPlants();
+                field.doAnimalStuff();
             }
         }
-        buryAnimals(diedAnimalsToday);
-        releaseNewBornAnimals(newBornAnimalsToday);
     }
 
-    private void releaseNewBornAnimals(List<Animal> newBornAnimalsToday) {
-        for (Animal newBornAnimal : newBornAnimalsToday) {
-            addAnimal(newBornAnimal, newBornAnimal.getLocation());
+    public void printStats() {
+        int totalNumberOfPlants = 0;
+        int totalNumberOfAnimals = 0;
+        int totalNumberOfDeadAnimals = 0;
+        int totalNumberOfNewBornAnimals = 0;
+        Animal theOldestAnimal = getTheOldestAnimal();
+        for (int y = 0; y < fields.length; y++) {
+            for (int x = 0; x < fields[y].length; x++) {
+                Field field = fields[y][x];
+                totalNumberOfAnimals = totalNumberOfAnimals + field.amountOfAnimalsOnTheField.values().stream().reduce(Integer::sum).orElseThrow();
+                totalNumberOfPlants = totalNumberOfPlants + field.getAmountOfPlantsOnTheField();
+                totalNumberOfDeadAnimals = totalNumberOfDeadAnimals + field.getGraveYardSize();
+                totalNumberOfNewBornAnimals = totalNumberOfNewBornAnimals + field.getNewBornAnimalsCounter();
+            }
         }
-        newBornAnimalsCounter = newBornAnimalsCounter + newBornAnimalsToday.size();
+        System.out.println("Plants total: " + totalNumberOfPlants);
+        System.out.println("Animals total: " + totalNumberOfAnimals);
+        System.out.println("Animals died: " + totalNumberOfDeadAnimals);
+        System.out.println("Were born " + totalNumberOfNewBornAnimals + " animals in total.");
+        System.out.println("The oldest animal is: " + theOldestAnimal + " lives already " + theOldestAnimal.getDaysAliveCounter() + " days.");
     }
 
-    private void buryAnimals(List<Animal> diedAnimalsToday) {
-        for (Animal deadAnimal : diedAnimalsToday) {
-            deleteAnimal(deadAnimal, deadAnimal.getLocation());
+    private Animal getTheOldestAnimal() {
+        Animal animal = fields[0][0].getTheOldestAnimal();
+        int daysAlive = animal.getDaysAliveCounter();
+        for (int y = 0; y < fields.length; y++) {
+            for (int x = 1; x < fields[y].length; x++) {
+                Field field = fields[y][x];
+                Animal animalToCompare = field.getTheOldestAnimal();
+                if (daysAlive < animalToCompare.getDaysAliveCounter()) {
+                    animal = animalToCompare;
+                }
+            }
         }
-        graveYard.addAll(diedAnimalsToday);
-    }
-
-    public void addPlants(List<Plant> newGrownPlantsToAdd, Field location) {
-        synchronized (location.plantsOnTheField) {
-            location.plantsOnTheField.addAll(newGrownPlantsToAdd);
-        }
-        synchronized (plantsPull) {
-            plantsPull.addAll(newGrownPlantsToAdd);
-        }
-    }
-
-    public synchronized boolean deletePlant(Plant plantToDelete) {
-        return plantsPull.remove(plantToDelete);
-    }
-
-    public void addAnimal(Animal animalToAdd, Field location) {
-        String animalTypeToAdd = animalToAdd.getProperties().getType();
-        synchronized (location.animalsOnTheField) {
-            location.animalsOnTheField.add(animalToAdd);
-        }
-        synchronized (location.amountOfAnimalsOnTheField) {
-            location.amountOfAnimalsOnTheField.put(animalTypeToAdd, location.amountOfAnimalsOnTheField.get(animalTypeToAdd) + 1);
-        }
-        synchronized (animalsPull) {
-            animalsPull.add(animalToAdd);
-        }
-    }
-
-    public void deleteAnimal(Animal animalToDelete, Field location) {
-        synchronized (location.animalsOnTheField) {
-            location.animalsOnTheField.remove(animalToDelete);
-        }
-        synchronized (location.amountOfAnimalsOnTheField) {
-            String animalType = animalToDelete.getProperties().getType();
-            location.amountOfAnimalsOnTheField.put(animalType, location.amountOfAnimalsOnTheField.get(animalType) - 1);
-        }
-        synchronized (animalsPull) {
-            animalsPull.remove(animalToDelete);
-        }
-    }
-
-    public String getTheOldestAnimal() {
-        Animal theOldestAnimal = animalsPull.stream().max(Comparator.comparingInt(Animal::getDaysAliveCounter)).orElseThrow();
-        return theOldestAnimal + " lives already " + theOldestAnimal.getDaysAliveCounter() + " days.";
-    }
-
-    public int getAnimalsPullSize() {
-        return animalsPull.size();
-    }
-
-    public int getPlantsPullSize() {
-        return plantsPull.size();
-    }
-
-    public int getGraveYardSize() {
-        return graveYard.size();
-    }
-
-    public int getNewBornAnimalsCounter() {
-        return newBornAnimalsCounter;
+        return animal;
     }
 
     @Override

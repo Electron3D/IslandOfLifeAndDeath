@@ -32,15 +32,9 @@ public class IslandSimulation implements Simulation {
 
     @Override
     public void simulate() {
-        System.out.println("Plants are growing");
-        island.growPlants();
-
-        System.out.println("Animals are living");
-        island.doAnimalStuff();
-
+        island.live();
         System.out.println("Results are printing");
         printSimulationResults();
-
         System.out.println();
         System.out.println();
         System.out.println();
@@ -49,10 +43,6 @@ public class IslandSimulation implements Simulation {
     @Override
     public void printSimulationResults() {
         System.out.println(island);
-        System.out.println("Plants total: " + island.getPlantsPullSize());
-        System.out.println("Animals total: " + island.getAnimalsPullSize());
-        System.out.println("Animals died: " + island.getGraveYardSize());
-        System.out.println("Were born " + island.getNewBornAnimalsCounter() + " animals in total.");
-        System.out.println("The oldest animal is: " + island.getTheOldestAnimal());
+        island.printStats();
     }
 }
