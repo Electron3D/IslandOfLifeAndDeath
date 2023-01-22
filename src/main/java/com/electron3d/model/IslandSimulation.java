@@ -6,10 +6,9 @@ import com.electron3d.model.island.Island;
 
 import java.util.List;
 
-public class IslandSimulation implements Simulation {
+public class IslandSimulation {
     private Island island;
 
-    @Override
     public void init() {
         System.out.println("Loading configuration...");
         AnimalsConfig animalsConfig = AnimalsConfig.getInstance();
@@ -23,24 +22,18 @@ public class IslandSimulation implements Simulation {
                 animalTypes);
         System.out.println("The island created");
         System.out.println("Initialization...");
-        island.initFields();
+        island.initCells();
         System.out.println("Initialization complete!");
-        System.out.println();
-        System.out.println();
-        System.out.println();
+        System.out.println("\n \n \n");
     }
 
-    @Override
     public void simulate() {
         island.live();
         System.out.println("Results are printing");
         printSimulationResults();
-        System.out.println();
-        System.out.println();
-        System.out.println();
+        System.out.println("\n \n \n");
     }
 
-    @Override
     public void printSimulationResults() {
         System.out.println(island);
         island.printStats();

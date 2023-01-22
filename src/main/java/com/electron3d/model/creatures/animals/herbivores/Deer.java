@@ -1,14 +1,12 @@
 package com.electron3d.model.creatures.animals.herbivores;
 
-import com.electron3d.model.creatures.Animal;
 import com.electron3d.model.creatures.AnimalProperties;
 import com.electron3d.model.creatures.Eatable;
-import com.electron3d.model.creatures.animals.Herbivores;
 import com.electron3d.model.creatures.animals.HerbivoresAnimal;
-import com.electron3d.model.island.Field;
+import com.electron3d.model.island.Cell;
 
 public class Deer extends HerbivoresAnimal implements Eatable {
-    public Deer(AnimalProperties properties, Field location) {
+    public Deer(AnimalProperties properties, Cell location) {
         super(properties, location);
     }
 

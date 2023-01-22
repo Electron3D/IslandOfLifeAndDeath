@@ -1,14 +1,14 @@
 package com.electron3d.engine;
 
-import com.electron3d.model.Simulation;
+import com.electron3d.model.IslandSimulation;
 
 public class SimulationEngine {
-    private final Simulation simulation;
+    private final IslandSimulation simulation;
     private final int timeMultiplier;
     private final int maxTimeOfSimulationInSeconds;
     private int timer;
 
-    public SimulationEngine(Simulation simulation, int timeMultiplier, int maxTimeOfSimulationInSeconds) {
+    public SimulationEngine(IslandSimulation simulation, int timeMultiplier, int maxTimeOfSimulationInSeconds) {
         this.simulation = simulation;
         this.timeMultiplier = timeMultiplier;
         this.maxTimeOfSimulationInSeconds = maxTimeOfSimulationInSeconds;

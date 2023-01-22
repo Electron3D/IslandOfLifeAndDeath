@@ -4,47 +4,48 @@ import com.electron3d.model.config.AnimalsConfig;
 import com.electron3d.model.creatures.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Island {
     private final int xDimension;
     private final int yDimension;
-    private final Field[][] fields;
+    private final Cell[][] cells;
     private final List<String> animalTypes;
 
     public Island(int xDimension, int yDimension, List<String> animalTypes) {
         this.xDimension = xDimension;
         this.yDimension = yDimension;
-        this.fields = new Field[yDimension][xDimension];
+        this.cells = new Cell[yDimension][xDimension];
         this.animalTypes = animalTypes;
     }
 
-    public void initFields() {
-        for (int y = 0; y < fields.length; y++) {
-            for (int x = 0; x < fields[y].length; x++) {
-                fields[y][x] = new Field(x, y);
-                Field field = fields[y][x];
-                initPlants(field);
-                initAnimals(field);
+    public void initCells() {
+        for (int y = 0; y < cells.length; y++) {
+            for (int x = 0; x < cells[y].length; x++) {
+                Cell cell = new Cell(x, y);
+                cells[y][x] = cell;
+                initPlants(cell);
+                initAnimals(cell);
             }
         }
-        for (int y = 0; y < fields.length; y++) {
-            for (int x = 0; x < fields[y].length; x++) {
-                Field field = fields[y][x];
-                field.possibleWays.addAll(initPossibleWays(field));
+        for (int y = 0; y < cells.length; y++) {
+            for (int x = 0; x < cells[y].length; x++) {
+                Cell cell = cells[y][x];
+                cell.possibleWays.addAll(initPossibleWays(cell));
             }
         }
     }
 
-    private void initPlants(Field field) {
+    private void initPlants(Cell cell) {
         Random startingPlantsCountChooser = new Random();
         PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
         int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(properties.getBoundOnTheSameField() + 1);
         for (int i = 0; i < amountOfPlantsOnTheField; i++) {
-            field.plantsOnTheField.add(new Plant(properties, field));
+            cell.plantsOnTheCell.add(new Plant(properties, cell));
         }
     }
 
-    private void initAnimals(Field field) {
+    private void initAnimals(Cell cell) {
         Random startingAnimalsCountChooser = new Random();
         List<AnimalProperties> animalsProperties = AnimalsConfig.getInstance().getAnimalsProperties();
         AnimalFactory factory = new AnimalFactory();
@@ -52,24 +53,23 @@ public class Island {
             AnimalProperties animalProperties = animalsProperties.stream().filter(x -> animalType.equals(x.getType())).findFirst().orElseThrow();
             int startingAnimalsCount = startingAnimalsCountChooser.nextInt(animalProperties.getBoundOnTheSameField() + 1);
             for (int i = 0; i < startingAnimalsCount; i++) {
-                Animal animal = factory.createAnimal(animalType, field);
+                Animal animal = factory.createAnimal(animalType, cell);
                 animal.setAdult(true);
-                field.animalsOnTheField.add(animal);
+                cell.animalsOnTheCell.add(animal);
             }
-            field.amountOfAnimalsOnTheField.put(animalType, field.animalsOnTheField.size());
         }
     }
 
-    private List<Field> initPossibleWays(Field field) {
-        List<Field> possibleWays = new ArrayList<>();
-        int i0 = field.getX();
-        int j0 = field.getY();
-        int height = fields.length;
-        int width = fields[0].length;
+    private List<Cell> initPossibleWays(Cell cell) {
+        List<Cell> possibleWays = new ArrayList<>();
+        int i0 = cell.getX();
+        int j0 = cell.getY();
+        int height = cells.length;
+        int width = cells[0].length;
         for (int i = i0 - 1; i <= i0 + 1; ++i) {
             for (int j = j0 - 1; j <= j0 + 1; ++j) {
                 if (0 <= i && i < height && 0 <= j && j < width && (i != i0 || j != j0)) {
-                    possibleWays.add(fields[i][j]);
+                    possibleWays.add(cells[i][j]);
                 }
             }
         }
@@ -77,11 +77,11 @@ public class Island {
     }
 
     public void live() {
-        for (int y = 0; y < fields.length; y++) {
-            for (int x = 0; x < fields[y].length; x++) {
-                Field field = fields[y][x];
-                field.growPlants();
-                field.doAnimalStuff();
+        for (int y = 0; y < cells.length; y++) {
+            for (int x = 0; x < cells[y].length; x++) {
+                Cell cell = cells[y][x];
+                cell.growPlants();
+                cell.doAnimalStuff();
             }
         }
     }
@@ -92,13 +92,13 @@ public class Island {
         int totalNumberOfDeadAnimals = 0;
         int totalNumberOfNewBornAnimals = 0;
         Animal theOldestAnimal = getTheOldestAnimal();
-        for (int y = 0; y < fields.length; y++) {
-            for (int x = 0; x < fields[y].length; x++) {
-                Field field = fields[y][x];
-                totalNumberOfAnimals = totalNumberOfAnimals + field.amountOfAnimalsOnTheField.values().stream().reduce(Integer::sum).orElseThrow();
-                totalNumberOfPlants = totalNumberOfPlants + field.getAmountOfPlantsOnTheField();
-                totalNumberOfDeadAnimals = totalNumberOfDeadAnimals + field.getGraveYardSize();
-                totalNumberOfNewBornAnimals = totalNumberOfNewBornAnimals + field.getNewBornAnimalsCounter();
+        for (int y = 0; y < cells.length; y++) {
+            for (int x = 0; x < cells[y].length; x++) {
+                Cell cell = cells[y][x];
+                totalNumberOfAnimals = totalNumberOfAnimals + cell.getAmountOfAnimalsOnTheCell();
+                totalNumberOfPlants = totalNumberOfPlants + cell.getAmountOfPlantsOnTheField();
+                totalNumberOfDeadAnimals = totalNumberOfDeadAnimals + cell.getGraveYardSize();
+                totalNumberOfNewBornAnimals = totalNumberOfNewBornAnimals + cell.getNewBornAnimalsCounter();
             }
         }
         System.out.println("Plants total: " + totalNumberOfPlants);
@@ -109,12 +109,12 @@ public class Island {
     }
 
     private Animal getTheOldestAnimal() {
-        Animal animal = fields[0][0].getTheOldestAnimal();
+        Animal animal = cells[0][0].getTheOldestAnimal();
         int daysAlive = animal.getDaysAliveCounter();
-        for (int y = 0; y < fields.length; y++) {
-            for (int x = 1; x < fields[y].length; x++) {
-                Field field = fields[y][x];
-                Animal animalToCompare = field.getTheOldestAnimal();
+        for (int y = 0; y < cells.length; y++) {
+            for (int x = 1; x < cells[y].length; x++) {
+                Cell cell = cells[y][x];
+                Animal animalToCompare = cell.getTheOldestAnimal();
                 if (daysAlive < animalToCompare.getDaysAliveCounter()) {
                     animal = animalToCompare;
                 }
@@ -125,29 +125,29 @@ public class Island {
 
     @Override
     public String toString() {
-        StringBuilder fieldsToString = new StringBuilder();
-        for (Field[] fieldsOnTheSameMeridian : fields) {
-            for (Field field : fieldsOnTheSameMeridian) {
-                fieldsToString.append(field.toString()).append(" ");
-                if (field.getX() < 10) {
-                    fieldsToString.append(" ");
+        StringBuilder cellsToString = new StringBuilder();
+        for (Cell[] cellsOnTheSameMeridian : cells) {
+            for (Cell cell : cellsOnTheSameMeridian) {
+                cellsToString.append(cell.toString()).append(" ");
+                if (cell.getX() < 10) {
+                    cellsToString.append(" ");
                 }
-                if (field.getY() < 10) {
-                    fieldsToString.append(" ");
+                if (cell.getY() < 10) {
+                    cellsToString.append(" ");
                 }
-                if (field.getAmountOfPlantsOnTheField() < 10) {
-                    fieldsToString.append(" ");
+                if (cell.getAmountOfPlantsOnTheField() < 10) {
+                    cellsToString.append(" ");
                 }
-                if (field.getAmountOfPlantsOnTheField() < 100) {
-                    fieldsToString.append(" ");
+                if (cell.getAmountOfPlantsOnTheField() < 100) {
+                    cellsToString.append(" ");
                 }
             }
-            fieldsToString.append("\n");
+            cellsToString.append("\n");
         }
         return "Island\n{" +
                 "parallelLength=" + xDimension +
                 ", meridianLength=" + yDimension +
-                ", fields=\n" + fieldsToString +
+                ", cells=\n" + cellsToString +
                 "}";
     }
 }

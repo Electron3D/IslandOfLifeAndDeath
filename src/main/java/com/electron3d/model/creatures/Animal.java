@@ -4,22 +4,19 @@ import com.electron3d.model.creatures.animals.HerbivoresAndCaterpillarEatingAnim
 import com.electron3d.model.creatures.animals.HerbivoresAnimal;
 import com.electron3d.model.creatures.animals.PredatorAnimal;
 import com.electron3d.model.creatures.animals.herbivores.Caterpillar;
-import com.electron3d.model.island.Field;
+import com.electron3d.model.island.Cell;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Stream;
 
 public abstract class Animal {
     private final AnimalProperties properties;
-    private Field location;
+    private Cell location;
     private int starvation;
     private int daysAliveCounter;
     private boolean isAdult;
 
-    public Animal(AnimalProperties properties, Field location) {
+    public Animal(AnimalProperties properties, Cell location) {
         this.properties = properties;
         this.location = location;
     }
@@ -64,7 +61,7 @@ public abstract class Animal {
         while (true) {
             try {
                 int attemptsToEat = 0;
-                while (attemptsToEat != 3) {
+                while (attemptsToEat <= 3) {
                     double resultsOfFindingFood = tryToFindSomethingEatable();
                     currentSatisfactionLevel = currentSatisfactionLevel + resultsOfFindingFood;
                     attemptsToEat++;
@@ -91,24 +88,24 @@ public abstract class Animal {
         if (this instanceof HerbivoresAndCaterpillarEatingAnimal) {
             Random random = new Random();
             if (random.nextInt(0, 2) == 1) {
-                currentSatisfactionLevel = eat((Eatable) location.animalsOnTheField.stream()
+                currentSatisfactionLevel = eat((Eatable) location.animalsOnTheCell.stream()
                         .filter(x -> x instanceof Caterpillar)
                         .findAny()
                         .orElseThrow());
             } else {
-                currentSatisfactionLevel = eat(location.plantsOnTheField
+                currentSatisfactionLevel = eat(location.plantsOnTheCell
                         .stream()
                         .findAny()
                         .orElseThrow());
             }
         } else if (this instanceof PredatorAnimal) {
-            currentSatisfactionLevel = eat((Eatable) location.animalsOnTheField
+            currentSatisfactionLevel = eat((Eatable) location.animalsOnTheCell
                     .stream()
                     .filter(x -> x instanceof Eatable && x != this)
                     .findAny()
                     .orElseThrow());
         } else if (this instanceof HerbivoresAnimal) {
-            currentSatisfactionLevel = eat(location.plantsOnTheField
+            currentSatisfactionLevel = eat(location.plantsOnTheCell
                     .stream()
                     .findAny()
                     .orElseThrow());
@@ -124,16 +121,17 @@ public abstract class Animal {
         return 1.0;
     }
 
-    public void walk(Field destinationField) {
-        location = destinationField;
+    public void walk(Cell destinationCell) {
+        location = destinationCell;
 
         //todo
     }
 
-    private Field chooseDirection() {
-        return location.possibleWays.stream()
-                .filter(x -> Stream.concat(x.animalsOnTheField.stream(), x.plantsOnTheField.stream()).anyMatch(y -> y instanceof Eatable))
-                .findAny().orElseThrow(); //todo redo
+    private Cell chooseDirection() {
+        /*return location.possibleWays.stream()
+                .filter(x -> Stream.concat(x.animalsOnTheCell.stream(), x.plantsOnTheCell.stream()).anyMatch(y -> y instanceof Eatable))
+                .findAny().orElseThrow(); //todo redo*/
+        return this.location;
     }
 
     private boolean die() {
@@ -154,14 +152,15 @@ public abstract class Animal {
     }
 
     private boolean breed() {
-        int numberOfAnimalsSameType = location.amountOfAnimalsOnTheField.get(this.properties.getType());
+        List<Animal> animalsSameType = location.animalsOnTheCell.parallelStream()
+                .filter(a -> a.properties.getType().equals(this.properties.getType()))
+                .toList();
+        int numberOfAnimalsSameType = animalsSameType.size();
         if (numberOfAnimalsSameType < properties.getBoundOnTheSameField()) {
-            return location.animalsOnTheField.stream()
-                    .filter(a -> a.properties.getType().equals(this.properties.getType()))
-                    .filter(b -> b.isAdult)
-                    .count() > 2;
+            return animalsSameType.parallelStream().filter(x -> x.isAdult).count() > 2;
+        } else {
+            return false;
         }
-        return false;
     }
 
     private void growUp() {
@@ -175,11 +174,11 @@ public abstract class Animal {
         return properties;
     }
 
-    public Field getLocation() {
+    public Cell getLocation() {
         return location;
     }
 
-    public void setLocation(Field location) {
+    public void setLocation(Cell location) {
         this.location = location;
     }
 

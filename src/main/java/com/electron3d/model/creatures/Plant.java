@@ -1,14 +1,14 @@
 package com.electron3d.model.creatures;
 
-import com.electron3d.model.island.Field;
+import com.electron3d.model.island.Cell;
 
 import java.util.Random;
 
 public class Plant implements Eatable {
     private final PlantProperties properties;
-    private final Field location;
+    private final Cell location;
 
-    public Plant(PlantProperties properties, Field location) {
+    public Plant(PlantProperties properties, Cell location) {
         this.properties = properties;
         this.location = location;
     }
@@ -36,7 +36,7 @@ public class Plant implements Eatable {
         return properties.getWeight();
     }
 
-    public Field getLocation() {
+    public Cell getLocation() {
         return location;
     }
 }

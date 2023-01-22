@@ -8,30 +8,29 @@ import com.electron3d.model.creatures.PlantProperties;
 
 import java.util.*;
 
-public class Field {
+public class Cell {
 
     //todo private modifiers and correct access for collections
-    public final Map<String, Integer> amountOfAnimalsOnTheField = new HashMap<>();
-    public final List<Animal> animalsOnTheField = new ArrayList<>();
-    public final List<Plant> plantsOnTheField = new ArrayList<>();
-    public final List<Field> possibleWays = new ArrayList<>();
+    public final List<Animal> animalsOnTheCell = new ArrayList<>();
+    public final List<Plant> plantsOnTheCell = new ArrayList<>();
+    public final List<Cell> possibleWays = new ArrayList<>();
     private final List<Animal> graveYard = new ArrayList<>();
     private int newBornAnimalsCounter;
     private final int x;
     private final int y;
 
-    public Field(int x, int y) {
+    public Cell(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     public void growPlants() {
         PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
-        for (int i = 0; i < plantsOnTheField.size(); i++) {
-            Plant plant = plantsOnTheField.get(i);
+        for (int i = 0; i < plantsOnTheCell.size(); i++) {
+            Plant plant = plantsOnTheCell.get(i);
             List<Plant> newGrownPlants = new ArrayList<>();
             int numberOfNewGrownPlants = plant.grow();
-            Field location = plant.getLocation();
+            Cell location = plant.getLocation();
             for (int j = 0; j < numberOfNewGrownPlants; j++) {
                 newGrownPlants.add(new Plant(properties, location));
             }
@@ -42,7 +41,7 @@ public class Field {
     public void doAnimalStuff() {
         List<Animal> diedAnimalsToday = new ArrayList<>();
         List<Animal> newBornAnimalsToday = new ArrayList<>();
-        for (Animal animal : animalsOnTheField) {
+        for (Animal animal : animalsOnTheCell) {
             Map<String, Boolean> resultsOfTheDay = animal.liveADay();
             boolean diedThisDay = resultsOfTheDay.get("diedThisDay");
             boolean breedSucceed = resultsOfTheDay.get("breedSucceed");
@@ -72,38 +71,30 @@ public class Field {
         graveYard.addAll(diedAnimalsToday);
     }
 
-    public void addPlants(List<Plant> newGrownPlantsToAdd, Field location) {
-        synchronized (location.plantsOnTheField) {
-            location.plantsOnTheField.addAll(newGrownPlantsToAdd);
+    private void addPlants(List<Plant> newGrownPlantsToAdd, Cell location) {
+        synchronized (location.plantsOnTheCell) {
+            location.plantsOnTheCell.addAll(newGrownPlantsToAdd);
         }
     }
 
-    public synchronized boolean deletePlant(Plant plantToDelete) {
-        return plantsOnTheField.remove(plantToDelete);
+    private synchronized boolean deletePlant(Plant plantToDelete) {
+        return plantsOnTheCell.remove(plantToDelete);
     }
 
-    public void addAnimal(Animal animalToAdd, Field location) {
-        String animalTypeToAdd = animalToAdd.getProperties().getType();
-        synchronized (location.animalsOnTheField) {
-            location.animalsOnTheField.add(animalToAdd);
-        }
-        synchronized (location.amountOfAnimalsOnTheField) {
-            location.amountOfAnimalsOnTheField.put(animalTypeToAdd, location.amountOfAnimalsOnTheField.get(animalTypeToAdd) + 1);
+    private void addAnimal(Animal animalToAdd, Cell location) {
+        synchronized (location.animalsOnTheCell) {
+            location.animalsOnTheCell.add(animalToAdd);
         }
     }
 
-    public void deleteAnimal(Animal animalToDelete, Field location) {
-        synchronized (location.animalsOnTheField) {
-            location.animalsOnTheField.remove(animalToDelete);
-        }
-        synchronized (location.amountOfAnimalsOnTheField) {
-            String animalType = animalToDelete.getProperties().getType();
-            location.amountOfAnimalsOnTheField.put(animalType, location.amountOfAnimalsOnTheField.get(animalType) - 1);
+    private void deleteAnimal(Animal animalToDelete, Cell location) {
+        synchronized (location.animalsOnTheCell) {
+            location.animalsOnTheCell.remove(animalToDelete);
         }
     }
 
     public Animal getTheOldestAnimal() {
-        return animalsOnTheField.stream().max(Comparator.comparingInt(Animal::getDaysAliveCounter)).orElseThrow();
+        return animalsOnTheCell.parallelStream().max(Comparator.comparingInt(Animal::getDaysAliveCounter)).orElseThrow();
     }
 
     public int getGraveYardSize() {
@@ -123,14 +114,14 @@ public class Field {
     }
 
     public int getAmountOfPlantsOnTheField() {
-        return plantsOnTheField.size();
+        return plantsOnTheCell.size();
     }
-    public int getAmountOfAnimalsOnTheField() {
-        return amountOfAnimalsOnTheField.values().stream().reduce(Integer::sum).orElseThrow();
+    public int getAmountOfAnimalsOnTheCell() {
+        return animalsOnTheCell.size();
     }
 
     @Override
     public String toString() {
-        return "{" + x + "," + y + "|plants:" + getAmountOfPlantsOnTheField() + "|animals:" + getAmountOfAnimalsOnTheField() + "}"; //todo
+        return "{" + x + "," + y + "|plants:" + getAmountOfPlantsOnTheField() + "|animals:" + getAmountOfAnimalsOnTheCell() + "}";
     }
 }

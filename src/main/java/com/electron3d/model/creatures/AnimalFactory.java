@@ -3,14 +3,14 @@ package com.electron3d.model.creatures;
 import com.electron3d.model.config.AnimalsConfig;
 import com.electron3d.model.creatures.animals.herbivores.*;
 import com.electron3d.model.creatures.animals.predators.*;
-import com.electron3d.model.island.Field;
+import com.electron3d.model.island.Cell;
 
 import java.util.List;
 
 public class AnimalFactory {
-    public Animal createAnimal(String animalType, Field location) {
+    public Animal createAnimal(String animalType, Cell location) {
         List<AnimalProperties> allProperties = AnimalsConfig.getInstance().getAnimalsProperties();
-        return switch (animalType.toLowerCase()) {
+        return switch (animalType.trim().toLowerCase()) {
             case "boar" -> new Boar(getAnimalPropertiesForType(animalType, allProperties), location);
             case "buffalo" -> new Buffalo(getAnimalPropertiesForType(animalType, allProperties), location);
             case "caterpillar" -> new Caterpillar(getAnimalPropertiesForType(animalType, allProperties), location);
