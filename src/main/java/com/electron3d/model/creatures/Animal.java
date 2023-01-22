@@ -24,6 +24,10 @@ public abstract class Animal {
         this.location = location;
     }
 
+    /**
+     *  Trying to satisfy needs and collect the results of the day
+     *  that depend on if the animal still alive or die and if it bred successfully.
+     */
     public Map<String, Boolean> liveADay() {
         Map<String, Boolean> resultsOfTheDay = new HashMap<>();
         boolean isSatisfied = satisfyNeeds();
@@ -43,21 +47,28 @@ public abstract class Animal {
                 starvation++;
             }
         }
-        growUp();
+        if (!resultsOfTheDay.get("diedThisDay")) {
+            growUp();
+        }
         return resultsOfTheDay;
     }
 
+    /**
+     *  In this method an animal tries to eat and if there isn't food it tries to find it in another field.
+     */
     private boolean satisfyNeeds() {
         int numberOfStepsLeft = properties.getRange();
         boolean isSatisfied = false;
         double currentSatisfactionLevel = 0.0;
+        double amountOfFoodEnoughToBeSatisfied = properties.getAmountOfFoodToBeFull() / 2;
         while (true) {
             try {
                 int attemptsToEat = 0;
                 while (attemptsToEat != 3) {
-                    currentSatisfactionLevel = currentSatisfactionLevel + tryToBeSatisfyingByEating();
+                    double resultsOfFindingFood = tryToFindSomethingEatable();
+                    currentSatisfactionLevel = currentSatisfactionLevel + resultsOfFindingFood;
                     attemptsToEat++;
-                    if (currentSatisfactionLevel > properties.getAmountOfFoodToBeFull() / 2) {
+                    if (currentSatisfactionLevel > amountOfFoodEnoughToBeSatisfied) {
                         isSatisfied = true;
                         break;
                     }
@@ -75,11 +86,11 @@ public abstract class Animal {
         return isSatisfied;
     }
 
-    private double tryToBeSatisfyingByEating() throws NoSuchElementException {
+    private double tryToFindSomethingEatable() throws NoSuchElementException {
         double currentSatisfactionLevel = 0;
         if (this instanceof HerbivoresAndCaterpillarEatingAnimal) {
             Random random = new Random();
-            if (random.nextInt(0, 2) == 1) { //todo add bound from config
+            if (random.nextInt(0, 2) == 1) {
                 currentSatisfactionLevel = eat((Eatable) location.animalsOnTheField.stream()
                         .filter(x -> x instanceof Caterpillar)
                         .findAny()
@@ -114,13 +125,15 @@ public abstract class Animal {
     }
 
     public void walk(Field destinationField) {
+        location = destinationField;
+
         //todo
     }
 
     private Field chooseDirection() {
         return location.possibleWays.stream()
                 .filter(x -> Stream.concat(x.animalsOnTheField.stream(), x.plantsOnTheField.stream()).anyMatch(y -> y instanceof Eatable))
-                .findAny().orElseThrow();
+                .findAny().orElseThrow(); //todo redo
     }
 
     private boolean die() {

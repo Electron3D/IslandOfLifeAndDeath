@@ -4,7 +4,9 @@ import com.electron3d.model.creatures.AnimalProperties;
 import com.electron3d.model.creatures.PlantProperties;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -97,30 +99,31 @@ public class AnimalsConfig extends Config {
         }
 
         private List<AnimalProperties> getAllAnimalPropertiesFrom(List<String> lines) {
-            String[] animalPropertiesNames = getHeader(lines).split(",");
+            String[] animalPropertiesNames = getCSVHeader(lines).split(",");
+            Map<String, Map<String, Double>> eatingChancesForAllAnimals = EatingChancesConfig.getInstance().getEatingChancesForAllAnimals();
             return lines.subList(1, lines.size()).stream().filter(x -> !(x.startsWith("plant"))).map(line -> {
                 String type = "";
                 double weight = -1;
                 int range = -1;
                 int boundOnTheSameField = -1;
                 double amountOfFoodToBeFull = -1;
+                Map<String, Double> chancesToEat = new HashMap<>();
                 String[] values = line.split(",");
                 for (int i = 0; i < animalPropertiesNames.length; i++) {
                     var value = values[i];
                     switch (animalPropertiesNames[i]) {
-                        case "type" -> type = value;
+                        case "type" -> {
+                            type = value;
+                            chancesToEat = eatingChancesForAllAnimals.get(type);
+                        }
                         case "weight" -> weight = Double.parseDouble(value);
                         case "range" -> range = Integer.parseInt(value);
                         case "boundOnTheSameField" -> boundOnTheSameField = Integer.parseInt(value);
                         case "amountOfFoodToBeFull" -> amountOfFoodToBeFull = Double.parseDouble(value);
                     }
                 }
-                return new AnimalProperties(type, weight, range, boundOnTheSameField, amountOfFoodToBeFull);
+                return new AnimalProperties(type, weight, range, boundOnTheSameField, amountOfFoodToBeFull, chancesToEat);
             }).collect(Collectors.toList());
-        }
-
-        private String getHeader(List<String> lines) {
-            return lines.get(0);
         }
 
         @Override

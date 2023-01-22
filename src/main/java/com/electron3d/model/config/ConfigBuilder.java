@@ -31,5 +31,8 @@ public abstract class ConfigBuilder<Config> {
         List<String> lines = new ArrayList<>();
         return lines;
     }
+    protected String getCSVHeader(List<String> lines) {
+        return lines.get(0);
+    }
     public abstract Config buildAndGetConfig();
 }

@@ -32,7 +32,7 @@ public class IslandSimulationConfig extends Config {
         return maxTimeOfSimulationInSeconds;
     }
 
-    public void maxTimeOfSimulationInSeconds(int maxTimer) {
+    public void maxNumberOfSimulationDays(int maxTimer) {
         this.maxTimeOfSimulationInSeconds = maxTimer;
     }
 
@@ -73,8 +73,8 @@ public class IslandSimulationConfig extends Config {
 
         private void setupSimulationParameters(List<String> lines) {
             //todo
-            toReturn.maxTimeOfSimulationInSeconds(30);
-            toReturn.setTimeMultiplierOfSimulation(4);
+            toReturn.maxNumberOfSimulationDays(150);
+            toReturn.setTimeMultiplierOfSimulation(8);
         }
 
         private void setupIslandDimensions(List<String> lines) {
