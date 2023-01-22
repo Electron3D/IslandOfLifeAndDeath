@@ -18,7 +18,7 @@ public class Plant implements Eatable {
         int amount = location.getAmountOfPlantsOnTheField();
         if (amount > 0 && amount < boundOnTheSameField) {
             Random random = new Random();
-            int numberOfNewGrownPlants = random.nextInt(0, 2);
+            int numberOfNewGrownPlants = random.nextInt(0, 3);
             int newAmount = amount + numberOfNewGrownPlants;
             if (newAmount > boundOnTheSameField) {
                 
