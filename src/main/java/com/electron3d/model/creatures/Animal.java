@@ -113,13 +113,13 @@ public abstract class Animal {
         return currentSatisfactionLevel;
     }
 
-    public double eat(Eatable food) {
+    public abstract double eat(Eatable food); /*{
         //todo
         // check chances and if success delete food,
         // check food.restoreHP() < this.properties.getAmountOfFoodToBeFull()
         // and return amount of eaten food
         return 1.0;
-    }
+    }*/
 
     public void walk(Cell destinationCell) {
         location = destinationCell;
