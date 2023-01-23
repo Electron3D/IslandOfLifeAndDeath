@@ -41,7 +41,9 @@ public class Island {
         PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
         int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(properties.getBoundOnTheSameField() + 1);
         for (int i = 0; i < amountOfPlantsOnTheField; i++) {
-            cell.plantsOnTheCell.add(new Plant(properties, cell));
+            Plant newPlant = new Plant(properties, cell);
+            newPlant.setPlantGrowth(3);
+            cell.plantsOnTheCell.add(newPlant);
         }
     }
 

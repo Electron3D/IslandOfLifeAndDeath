@@ -27,21 +27,21 @@ public class Cell {
     public void growPlants() {
         PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
         for (int i = 0; i < plantsOnTheCell.size(); i++) {
-            Plant plant = plantsOnTheCell.get(i);
             List<Plant> newGrownPlants = new ArrayList<>();
+            Plant plant = plantsOnTheCell.get(i);
             int numberOfNewGrownPlants = plant.grow();
-            Cell location = plant.getLocation();
             for (int j = 0; j < numberOfNewGrownPlants; j++) {
-                newGrownPlants.add(new Plant(properties, location));
+                newGrownPlants.add(new Plant(properties, this));
             }
-            addPlants(newGrownPlants, location);
+            addPlants(newGrownPlants);
         }
     }
 
     public void doAnimalStuff() {
         List<Animal> diedAnimalsToday = new ArrayList<>();
         List<Animal> newBornAnimalsToday = new ArrayList<>();
-        for (Animal animal : animalsOnTheCell) {
+        for (int i = 0; i < animalsOnTheCell.size(); i++) {
+            Animal animal = animalsOnTheCell.get(i);
             Map<String, Boolean> resultsOfTheDay = animal.liveADay();
             boolean diedThisDay = resultsOfTheDay.get("diedThisDay");
             boolean breedSucceed = resultsOfTheDay.get("breedSucceed");
@@ -57,39 +57,42 @@ public class Cell {
         buryAnimals(diedAnimalsToday);
         releaseNewBornAnimals(newBornAnimalsToday);
     }
+
     private void releaseNewBornAnimals(List<Animal> newBornAnimalsToday) {
         for (Animal newBornAnimal : newBornAnimalsToday) {
-            addAnimal(newBornAnimal, newBornAnimal.getLocation());
+            addAnimal(newBornAnimal);
         }
         newBornAnimalsCounter = newBornAnimalsCounter + newBornAnimalsToday.size();
     }
 
     private void buryAnimals(List<Animal> diedAnimalsToday) {
-        for (Animal deadAnimal : diedAnimalsToday) {
-            deleteAnimal(deadAnimal, deadAnimal.getLocation());
-        }
         graveYard.addAll(diedAnimalsToday);
-    }
-
-    private void addPlants(List<Plant> newGrownPlantsToAdd, Cell location) {
-        synchronized (location.plantsOnTheCell) {
-            location.plantsOnTheCell.addAll(newGrownPlantsToAdd);
+        for (Animal deadAnimal : diedAnimalsToday) {
+            deleteAnimal(deadAnimal);
         }
     }
 
-    private synchronized boolean deletePlant(Plant plantToDelete) {
-        return plantsOnTheCell.remove(plantToDelete);
-    }
-
-    private void addAnimal(Animal animalToAdd, Cell location) {
-        synchronized (location.animalsOnTheCell) {
-            location.animalsOnTheCell.add(animalToAdd);
+    private void addPlants(List<Plant> newGrownPlantsToAdd) {
+        synchronized (plantsOnTheCell) {
+            plantsOnTheCell.addAll(newGrownPlantsToAdd);
         }
     }
 
-    private void deleteAnimal(Animal animalToDelete, Cell location) {
-        synchronized (location.animalsOnTheCell) {
-            location.animalsOnTheCell.remove(animalToDelete);
+    private void deletePlant(Plant plantToDelete) {
+        synchronized (plantsOnTheCell) {
+            plantsOnTheCell.remove(plantToDelete);
+        }
+    }
+
+    public void addAnimal(Animal animalToAdd) {
+        synchronized (animalsOnTheCell) {
+            animalsOnTheCell.add(animalToAdd);
+        }
+    }
+
+    public void deleteAnimal(Animal animalToDelete) {
+        synchronized (animalsOnTheCell) {
+            animalsOnTheCell.remove(animalToDelete);
         }
     }
 

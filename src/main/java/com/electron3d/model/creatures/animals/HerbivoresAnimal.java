@@ -6,14 +6,16 @@ import com.electron3d.model.creatures.Eatable;
 import com.electron3d.model.creatures.Plant;
 import com.electron3d.model.island.Cell;
 
+import java.util.List;
+
 public abstract class HerbivoresAnimal extends Animal implements Herbivores {
     public HerbivoresAnimal(AnimalProperties properties, Cell location) {
         super(properties, location);
     }
 
     @Override
-    public double eat(Eatable food) {
-        //eatPlant((Plant) food);
-        return 0;
+    public double eat(List<Eatable> food) {
+        Plant dish = (Plant) food.parallelStream().filter(x -> x instanceof Plant).findFirst().orElseThrow();
+        return eatPlant(dish);
     }
 }

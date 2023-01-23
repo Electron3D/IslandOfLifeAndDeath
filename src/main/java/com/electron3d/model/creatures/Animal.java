@@ -15,10 +15,12 @@ public abstract class Animal {
     private int starvation;
     private int daysAliveCounter;
     private boolean isAdult;
+    protected final double amountOfFoodEnoughToBeSatisfied;
 
     public Animal(AnimalProperties properties, Cell location) {
         this.properties = properties;
         this.location = location;
+        this.amountOfFoodEnoughToBeSatisfied = properties.getAmountOfFoodToBeFull() / 2;
     }
 
     /**
@@ -57,7 +59,6 @@ public abstract class Animal {
         int numberOfStepsLeft = properties.getRange();
         boolean isSatisfied = false;
         double currentSatisfactionLevel = 0.0;
-        double amountOfFoodEnoughToBeSatisfied = properties.getAmountOfFoodToBeFull() / 2;
         while (true) {
             try {
                 int attemptsToEat = 0;
@@ -85,68 +86,53 @@ public abstract class Animal {
 
     private double tryToFindSomethingEatable() throws NoSuchElementException {
         double currentSatisfactionLevel = 0;
-        if (this instanceof HerbivoresAndCaterpillarEatingAnimal) {
-            Random random = new Random();
-            if (random.nextInt(0, 2) == 1) {
-                currentSatisfactionLevel = eat((Eatable) location.animalsOnTheCell.stream()
-                        .filter(x -> x instanceof Caterpillar)
-                        .findAny()
-                        .orElseThrow());
-            } else {
-                currentSatisfactionLevel = eat(location.plantsOnTheCell
-                        .stream()
-                        .findAny()
-                        .orElseThrow());
-            }
-        } else if (this instanceof PredatorAnimal) {
-            currentSatisfactionLevel = eat((Eatable) location.animalsOnTheCell
-                    .stream()
-                    .filter(x -> x instanceof Eatable && x != this)
-                    .findAny()
-                    .orElseThrow());
-        } else if (this instanceof HerbivoresAnimal) {
-            currentSatisfactionLevel = eat(location.plantsOnTheCell
-                    .stream()
-                    .findAny()
-                    .orElseThrow());
-        }
+        List<Eatable> eatableList = Stream.concat(
+                location.animalsOnTheCell.parallelStream()
+                        .filter(x -> x instanceof Eatable)
+                        .map(x -> (Eatable) x),
+                location.plantsOnTheCell.parallelStream()
+                        .map(x -> (Eatable) x)
+                ).toList();
+        currentSatisfactionLevel = eat(eatableList);
         return currentSatisfactionLevel;
     }
 
-    public abstract double eat(Eatable food); /*{
-        //todo
+    public abstract double eat(List<Eatable> food);
+        // todo
         // check chances and if success delete food,
         // check food.restoreHP() < this.properties.getAmountOfFoodToBeFull()
         // and return amount of eaten food
-        return 1.0;
-    }*/
 
     public void walk(Cell destinationCell) {
+        destinationCell.addAnimal(this);
+        location.deleteAnimal(this);
         location = destinationCell;
-
-        //todo
     }
 
     private Cell chooseDirection() {
-        /*return location.possibleWays.stream()
+
+        return location.possibleWays.stream()
                 .filter(x -> Stream.concat(x.animalsOnTheCell.stream(), x.plantsOnTheCell.stream()).anyMatch(y -> y instanceof Eatable))
-                .findAny().orElseThrow(); //todo redo*/
-        return this.location;
+                .findAny().orElseThrow();
     }
 
+    /**
+     *  The animal has a chance to reset scale of starvation to 0 or just to one point below.
+     *  Dice will be rolled to decide the fait.
+     *  If the dice show 20 than this animal is the lucky one! It has a second chance to live! Starvation is fully satisfied now.
+     *  If th result will be more than 10 than this animal can live one more day..
+     *  Otherwise sorry, but this animal is dead. Send a flower to it on its grave..
+     */
     private boolean die() {
         Random dice = new Random();
         int savingThrow = dice.nextInt(1, 21);
         if (savingThrow == 20) {
             starvation = 0;
-            //System.out.println("Oh! This " + this.properties.getType() + " is the lucky one! You have a second chance to live! Starvation is fully satisfied now.");
             return false;
         } else if (savingThrow > 10) {
             starvation--;
-            //System.out.println("This " + this.properties.getType() + " can live one more day..");
             return false;
         } else {
-            //System.out.println("Sorry, this " + this.properties.getType() + " is dead. Send a flower to it on its grave..");
             return true;
         }
     }
