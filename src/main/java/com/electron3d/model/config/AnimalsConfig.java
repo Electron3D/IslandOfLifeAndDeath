@@ -71,7 +71,7 @@ public class AnimalsConfig extends Config {
                 String line = lines.get(i);
                 String type = getType(line);
                 if (isPlant(type)) {
-                    setPlantProperties(line);
+                    setPlantProperties(type, line);
                 } else {
                     animalsNames.add(type);
                 }
@@ -79,11 +79,11 @@ public class AnimalsConfig extends Config {
             return animalsNames;
         }
 
-        private void setPlantProperties(String line) {
+        private void setPlantProperties(String type, String line) {
             String[] values = line.split(",");
             double weight = Double.parseDouble(values[1]);
             int boundOnTheSameField = Integer.parseInt(values[2]);
-            plantProperties = new PlantProperties(weight, boundOnTheSameField);
+            plantProperties = new PlantProperties(type, weight, boundOnTheSameField);
         }
 
         private PlantProperties getPlantProperties() {

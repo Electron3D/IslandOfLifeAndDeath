@@ -6,9 +6,9 @@ import java.util.Random;
 
 public class Plant implements Eatable {
     private final PlantProperties properties;
+
     private final Cell location;
     private int plantGrowth;
-
     public Plant(PlantProperties properties, Cell location) {
         this.properties = properties;
         this.location = location;
@@ -41,11 +41,15 @@ public class Plant implements Eatable {
         return properties.getWeight();
     }
 
-    public void setPlantGrowth(int plantGrowth) {
-        this.plantGrowth = plantGrowth;
-    }
-
     public Cell getLocation() {
         return location;
+    }
+
+    public PlantProperties getProperties() {
+        return properties;
+    }
+
+    public void setPlantGrowth(int plantGrowth) {
+        this.plantGrowth = plantGrowth;
     }
 }

@@ -54,7 +54,7 @@ public class EatingChancesConfig extends Config {
                     String foodName = foodNames.get(j);
                     String value = values.get(j);
                     if (!foodName.equals(type)) {
-                        eatChances.put(foodName, Double.valueOf(value));
+                        eatChances.put(foodName, Double.parseDouble(value) / 100);
                     }
                 }
                 eatingChancesForAllAnimals.put(type, eatChances);

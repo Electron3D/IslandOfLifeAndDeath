@@ -4,7 +4,6 @@ import com.electron3d.model.config.AnimalsConfig;
 import com.electron3d.model.creatures.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Island {
     private final int xDimension;
@@ -71,7 +70,7 @@ public class Island {
         for (int i = i0 - 1; i <= i0 + 1; ++i) {
             for (int j = j0 - 1; j <= j0 + 1; ++j) {
                 if (0 <= i && i < height && 0 <= j && j < width && (i != i0 || j != j0)) {
-                    possibleWays.add(cells[i][j]);
+                    possibleWays.add(cells[j][i]);
                 }
             }
         }

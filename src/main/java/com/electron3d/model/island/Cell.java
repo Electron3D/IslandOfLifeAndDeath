@@ -11,7 +11,7 @@ import java.util.*;
 public class Cell {
 
     //todo private modifiers and correct access for collections
-    public final List<Animal> animalsOnTheCell = new ArrayList<>();
+    public final Set<Animal> animalsOnTheCell = new HashSet<>();
     public final List<Plant> plantsOnTheCell = new ArrayList<>();
     public final List<Cell> possibleWays = new ArrayList<>();
     private final List<Animal> graveYard = new ArrayList<>();
@@ -40,20 +40,18 @@ public class Cell {
     public void doAnimalStuff() {
         List<Animal> diedAnimalsToday = new ArrayList<>();
         List<Animal> newBornAnimalsToday = new ArrayList<>();
-        for (int i = 0; i < animalsOnTheCell.size(); i++) {
-            Animal animal = animalsOnTheCell.get(i);
-            Map<String, Boolean> resultsOfTheDay = animal.liveADay();
-            boolean diedThisDay = resultsOfTheDay.get("diedThisDay");
-            boolean breedSucceed = resultsOfTheDay.get("breedSucceed");
-            if (diedThisDay) {
+        //todo redo with iterator?? concurrent modification exception
+        animalsOnTheCell.forEach(animal -> {
+            boolean breedSucceed = animal.liveADay();
+            if (animal.isDead()) {
                 diedAnimalsToday.add(animal);
             }
             if (breedSucceed) {
                 AnimalFactory factory = new AnimalFactory();
-                Animal animalToAdd = factory.createAnimal(animal.getProperties().getType(), animal.getLocation());
+                Animal animalToAdd = factory.createAnimal(animal.getProperties().getType(), animal.getCurrentLocation());
                 newBornAnimalsToday.add(animalToAdd);
             }
-        }
+        });
         buryAnimals(diedAnimalsToday);
         releaseNewBornAnimals(newBornAnimalsToday);
     }
@@ -78,7 +76,7 @@ public class Cell {
         }
     }
 
-    private void deletePlant(Plant plantToDelete) {
+    public void deletePlant(Plant plantToDelete) {
         synchronized (plantsOnTheCell) {
             plantsOnTheCell.remove(plantToDelete);
         }

@@ -1,9 +1,5 @@
 package com.electron3d.model.creatures;
 
-import com.electron3d.model.creatures.animals.HerbivoresAndCaterpillarEatingAnimal;
-import com.electron3d.model.creatures.animals.HerbivoresAnimal;
-import com.electron3d.model.creatures.animals.PredatorAnimal;
-import com.electron3d.model.creatures.animals.herbivores.Caterpillar;
 import com.electron3d.model.island.Cell;
 
 import java.util.*;
@@ -11,125 +7,122 @@ import java.util.stream.Stream;
 
 public abstract class Animal {
     private final AnimalProperties properties;
-    private Cell location;
+    protected final double fullEnoughLevel;
+    protected final int startedHealthPoints;
+    protected int currentHealthPoints;
     private int starvation;
     private int daysAliveCounter;
     private boolean isAdult;
-    protected final double amountOfFoodEnoughToBeSatisfied;
+    private boolean isDead;
+    private Cell previousLocation;
+    private Cell currentLocation;
 
-    public Animal(AnimalProperties properties, Cell location) {
+    public Animal(AnimalProperties properties, Cell currentLocation) {
         this.properties = properties;
-        this.location = location;
-        this.amountOfFoodEnoughToBeSatisfied = properties.getAmountOfFoodToBeFull() / 2;
+        this.fullEnoughLevel = properties.getAmountOfFoodToBeFull() / 3;
+        this.startedHealthPoints = (int) (properties.getWeight() - properties.getAmountOfFoodToBeFull() * 1000);
+        this.currentHealthPoints = startedHealthPoints;
+        this.currentLocation = currentLocation;
     }
 
     /**
-     *  Trying to satisfy needs and collect the results of the day
-     *  that depend on if the animal still alive or die and if it bred successfully.
+     * Collect the results of the day from trying to satisfyNeeds method
+     * that depend on if the animal still alive or die and if it bred successfully.
      */
-    public Map<String, Boolean> liveADay() {
-        Map<String, Boolean> resultsOfTheDay = new HashMap<>();
-        boolean isSatisfied = satisfyNeeds();
-        if (isSatisfied) {
+    public boolean liveADay() {
+        boolean success = roamInSearchOfFood();
+        feelHunger();
+        if (currentHealthPoints <= 0) {
+            isDead = die();
+        }
+        if (success) {
             if (isAdult) {
-                resultsOfTheDay.put("breedSucceed", breed());
+                return breed();
             } else {
-                resultsOfTheDay.put("breedSucceed", false);
+                return false;
             }
-            resultsOfTheDay.put("diedThisDay", false);
         } else {
-            resultsOfTheDay.put("breedSucceed", false);
             if (starvation >= 7) {
-                resultsOfTheDay.put("diedThisDay", die());
+                isDead = die();
             } else {
-                resultsOfTheDay.put("diedThisDay", false);
                 starvation++;
             }
         }
-        if (!resultsOfTheDay.get("diedThisDay")) {
+        if (!isDead) {
             growUp();
         }
-        return resultsOfTheDay;
+        return false;
     }
 
     /**
-     *  In this method an animal tries to eat and if there isn't food it tries to find it in another field.
+     * In this method an animal tries to eat and if there isn't food it tries to find it in another field.
      */
-    private boolean satisfyNeeds() {
+    private boolean roamInSearchOfFood() {
         int numberOfStepsLeft = properties.getRange();
-        boolean isSatisfied = false;
-        double currentSatisfactionLevel = 0.0;
-        while (true) {
-            try {
-                int attemptsToEat = 0;
-                while (attemptsToEat <= 3) {
-                    double resultsOfFindingFood = tryToFindSomethingEatable();
-                    currentSatisfactionLevel = currentSatisfactionLevel + resultsOfFindingFood;
-                    attemptsToEat++;
-                    if (currentSatisfactionLevel > amountOfFoodEnoughToBeSatisfied) {
-                        isSatisfied = true;
-                        break;
-                    }
-                }
-                break;
-            } catch (NoSuchElementException e) {
-                if (numberOfStepsLeft == 0) {
-                    break;
-                } else {
-                    walk(chooseDirection());
-                    numberOfStepsLeft--;
-                }
+        boolean success;
+        while (numberOfStepsLeft >= 0) {
+            Eatable food = findFood(getFoodListFromCell());
+            if (food != null) {
+                success = eat(food);
+                return success;
+            } else {
+                walk(chooseDirection());
+                numberOfStepsLeft--;
             }
         }
-        return isSatisfied;
+        return false;
     }
 
-    private double tryToFindSomethingEatable() throws NoSuchElementException {
-        double currentSatisfactionLevel = 0;
-        List<Eatable> eatableList = Stream.concat(
-                location.animalsOnTheCell.parallelStream()
+    private List<Eatable> getFoodListFromCell() {
+        return Stream.concat(
+                currentLocation.animalsOnTheCell.stream()
                         .filter(x -> x instanceof Eatable)
                         .map(x -> (Eatable) x),
-                location.plantsOnTheCell.parallelStream()
+                currentLocation.plantsOnTheCell.stream()
                         .map(x -> (Eatable) x)
-                ).toList();
-        currentSatisfactionLevel = eat(eatableList);
-        return currentSatisfactionLevel;
+        ).toList();
     }
 
-    public abstract double eat(List<Eatable> food);
-        // todo
-        // check chances and if success delete food,
-        // check food.restoreHP() < this.properties.getAmountOfFoodToBeFull()
-        // and return amount of eaten food
+    public abstract boolean eat(Eatable food);
+
+    public abstract Eatable findFood(List<Eatable> foodList);
 
     public void walk(Cell destinationCell) {
         destinationCell.addAnimal(this);
-        location.deleteAnimal(this);
-        location = destinationCell;
+        currentLocation.deleteAnimal(this);
+        previousLocation = currentLocation;
+        currentLocation = destinationCell;
+        System.out.println(this + " move from " + previousLocation + " to " + currentLocation);
     }
 
     private Cell chooseDirection() {
-        /*return location.possibleWays.stream()
-                .filter(x -> Stream.concat(x.animalsOnTheCell.stream(), x.plantsOnTheCell.stream()).anyMatch(y -> y instanceof Eatable))
-                .findAny().orElseThrow();*/ //todo add random to choose the way
-        return location;
+        Cell destinationCell = currentLocation.possibleWays.get(new Random().nextInt(0, currentLocation.possibleWays.size()));
+        if (destinationCell != previousLocation) {
+            return destinationCell;
+        } else {
+            return chooseDirection();
+        }
+    }
+    private void feelHunger() {
+        currentHealthPoints = currentHealthPoints - starvation * 2;
     }
 
     /**
-     *  The animal has a chance to reset scale of starvation to 0 or just to one point below.
-     *  Dice will be rolled to decide the fait.
-     *  If the dice show 20 than this animal is the lucky one! It has a second chance to live! Starvation is fully satisfied now.
-     *  If th result will be more than 10 than this animal can live one more day..
-     *  Otherwise sorry, but this animal is dead. Send a flower to it on its grave..
+     * The animal has a chance to reset scale of starvation to 0 or just to one point below.
+     * Dice will be rolled to decide the fait.
+     * If the dice show 20 than this animal is the lucky one! It has a second chance to live! Starvation is fully satisfied now, health restored.
+     * If th result will be more than 10 than this animal can live one more day...
+     * Otherwise sorry, but this animal is dead. Send a flower to it on its grave...
      */
     private boolean die() {
         Random dice = new Random();
         int savingThrow = dice.nextInt(1, 21);
         if (savingThrow == 20) {
+            currentHealthPoints = startedHealthPoints;
             starvation = 0;
             return false;
         } else if (savingThrow > 10) {
+            currentHealthPoints = 1;
             starvation--;
             return false;
         } else {
@@ -138,7 +131,7 @@ public abstract class Animal {
     }
 
     private boolean breed() {
-        List<Animal> animalsSameType = location.animalsOnTheCell.parallelStream()
+        List<Animal> animalsSameType = currentLocation.animalsOnTheCell.parallelStream()
                 .filter(a -> a.properties.getType().equals(this.properties.getType()))
                 .toList();
         int numberOfAnimalsSameType = animalsSameType.size();
@@ -160,12 +153,8 @@ public abstract class Animal {
         return properties;
     }
 
-    public Cell getLocation() {
-        return location;
-    }
-
-    public void setLocation(Cell location) {
-        this.location = location;
+    public Cell getCurrentLocation() {
+        return currentLocation;
     }
 
     public int getDaysAliveCounter() {
@@ -174,5 +163,9 @@ public abstract class Animal {
 
     public void setAdult(boolean adult) {
         isAdult = adult;
+    }
+
+    public boolean isDead() {
+        return isDead;
     }
 }

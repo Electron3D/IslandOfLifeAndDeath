@@ -8,26 +8,58 @@ import com.electron3d.model.creatures.animals.herbivores.Caterpillar;
 import com.electron3d.model.island.Cell;
 
 import java.util.List;
+import java.util.Random;
 
-public abstract class HerbivoresAndCaterpillarEatingAnimal extends Animal implements Herbivores, Predatory {
+public abstract class HerbivoresAndCaterpillarEatingAnimal extends HerbivoresAnimal implements Predatory {
     public HerbivoresAndCaterpillarEatingAnimal(AnimalProperties properties, Cell location) {
         super(properties, location);
     }
 
     @Override
-    public double eat(List<Eatable> food) {
-        Plant dish = (Plant) food.parallelStream().filter(x -> x instanceof Plant).findFirst().orElseThrow();
-        double satisfactionLevel = eatPlant(dish);
-        boolean stillHungry = satisfactionLevel > amountOfFoodEnoughToBeSatisfied;
-        if (stillHungry) {
-            Caterpillar dessert = (Caterpillar) food.parallelStream().filter(x -> x instanceof Caterpillar).findFirst().orElseThrow();
-            satisfactionLevel = satisfactionLevel + eatCaterpillar(dessert);
-        }
-        return satisfactionLevel;
+    public Eatable findFood(List<Eatable> foodList) {
+        return foodList.parallelStream().filter(x -> x instanceof Plant).findFirst().orElse(findCaterpillar(foodList));
+    }
+    public Eatable findCaterpillar(List<Eatable> foodList) {
+        return foodList.parallelStream().filter(x -> x instanceof Caterpillar).findFirst().orElse(null);
     }
 
-    private double eatCaterpillar(Caterpillar food) {
-        //todo
-        return 1;
+    @Override
+    public boolean eat(Eatable food) {
+        double restoredHP;
+        if (food instanceof Plant plantToEat) {
+            restoredHP = eatPlant(plantToEat);
+        } else {
+            Caterpillar dessert = (Caterpillar) food;
+            restoredHP = hunt(dessert);
+        }
+        if (restoredHP == 0) {
+            return false;
+        } else {
+            currentHealthPoints = currentHealthPoints + (int) restoredHP;
+            return true;
+        }
+    }
+
+    @Override
+    public double hunt(Animal food) {
+        Random chanceToEat = new Random();
+        Caterpillar exactFood = (Caterpillar) food;
+        double chance = getProperties().getChancesToEat(exactFood.getProperties().getType());
+        double restoredHP = 0;
+        if (chanceToEat.nextDouble(0, 1) < chance) {
+            restoredHP = exactFood.restoreHP();
+            getCurrentLocation().deleteAnimal(exactFood);
+            if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
+                if (currentHealthPoints + restoredHP <= startedHealthPoints) {
+                    return restoredHP;
+                } else {
+                    return startedHealthPoints - currentHealthPoints;
+                }
+            } else {
+                return getProperties().getAmountOfFoodToBeFull();
+            }
+        } else {
+            return restoredHP;
+        }
     }
 }
