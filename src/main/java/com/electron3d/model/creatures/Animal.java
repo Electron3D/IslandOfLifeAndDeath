@@ -110,10 +110,10 @@ public abstract class Animal {
     }
 
     private Cell chooseDirection() {
-
-        return location.possibleWays.stream()
+        /*return location.possibleWays.stream()
                 .filter(x -> Stream.concat(x.animalsOnTheCell.stream(), x.plantsOnTheCell.stream()).anyMatch(y -> y instanceof Eatable))
-                .findAny().orElseThrow();
+                .findAny().orElseThrow();*/ //todo add random to choose the way
+        return location;
     }
 
     /**
