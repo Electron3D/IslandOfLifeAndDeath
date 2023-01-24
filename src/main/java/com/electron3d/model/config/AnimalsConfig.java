@@ -1,12 +1,10 @@
 package com.electron3d.model.config;
 
 import com.electron3d.model.creatures.AnimalProperties;
+import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.creatures.PlantProperties;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -100,9 +98,9 @@ public class AnimalsConfig extends Config {
 
         private List<AnimalProperties> getAllAnimalPropertiesFrom(List<String> lines) {
             String[] animalPropertiesNames = getCSVHeader(lines).split(",");
-            Map<String, Map<String, Double>> eatingChancesForAllAnimals = EatingChancesConfig.getInstance().getEatingChancesForAllAnimals();
+            Map<AnimalType, Map<String, Double>> eatingChancesForAllAnimals = EatingChancesConfig.getInstance().getEatingChancesForAllAnimals();
             return lines.subList(1, lines.size()).stream().filter(x -> !(x.startsWith("plant"))).map(line -> {
-                String type = "";
+                AnimalType type = null;
                 double weight = -1;
                 int range = -1;
                 int boundOnTheSameField = -1;
@@ -113,7 +111,7 @@ public class AnimalsConfig extends Config {
                     var value = values[i];
                     switch (animalPropertiesNames[i]) {
                         case "type" -> {
-                            type = value;
+                            type = Arrays.stream(AnimalType.values()).filter(x -> x.getType().equals(value)).findFirst().get();
                             chancesToEat = eatingChancesForAllAnimals.get(type);
                         }
                         case "weight" -> weight = Double.parseDouble(value);

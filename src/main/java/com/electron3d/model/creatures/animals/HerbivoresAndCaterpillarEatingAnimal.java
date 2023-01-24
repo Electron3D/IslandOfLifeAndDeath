@@ -51,10 +51,11 @@ public abstract class HerbivoresAndCaterpillarEatingAnimal extends HerbivoresAni
     public double hunt(Animal food) {
         Random chanceToEat = new Random();
         Caterpillar exactFood = (Caterpillar) food;
-        double chance = getProperties().getChancesToEat(exactFood.getProperties().getType());
+        double chance = getProperties().getChancesToEat(exactFood.getProperties().getType().getType());
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = exactFood.restoreHP();
+            //System.out.println("Animal " + this + " eat " + food);
             exactFood.setDead(true);
             if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
                 if (currentHealthPoints + restoredHP <= startedHealthPoints) {

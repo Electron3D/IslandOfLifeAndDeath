@@ -9,9 +9,9 @@ public class Island {
     private final int xDimension;
     private final int yDimension;
     private final Cell[][] cells;
-    private final List<String> animalTypes;
+    private final List<AnimalType> animalTypes;
 
-    public Island(int xDimension, int yDimension, List<String> animalTypes) {
+    public Island(int xDimension, int yDimension, List<AnimalType> animalTypes) {
         this.xDimension = xDimension;
         this.yDimension = yDimension;
         this.cells = new Cell[yDimension][xDimension];
@@ -30,7 +30,7 @@ public class Island {
         for (int y = 0; y < cells.length; y++) {
             for (int x = 0; x < cells[y].length; x++) {
                 Cell cell = cells[y][x];
-                cell.possibleWays.addAll(initPossibleWays(cell));
+                cell.addPossibleWays(initPossibleWays(cell));
             }
         }
     }
@@ -42,7 +42,7 @@ public class Island {
         for (int i = 0; i < amountOfPlantsOnTheField; i++) {
             Plant newPlant = new Plant(properties, cell);
             newPlant.setPlantGrowth(3);
-            cell.plantsOnTheCell.add(newPlant);
+            cell.addPlant(newPlant);
         }
     }
 
@@ -50,13 +50,13 @@ public class Island {
         Random startingAnimalsCountChooser = new Random();
         List<AnimalProperties> animalsProperties = AnimalsConfig.getInstance().getAnimalsProperties();
         AnimalFactory factory = new AnimalFactory();
-        for (String animalType : animalTypes) {
+        for (AnimalType animalType : animalTypes) {
             AnimalProperties animalProperties = animalsProperties.stream().filter(x -> animalType.equals(x.getType())).findFirst().orElseThrow();
             int startingAnimalsCount = startingAnimalsCountChooser.nextInt(animalProperties.getBoundOnTheSameField() + 1);
             for (int i = 0; i < startingAnimalsCount; i++) {
                 Animal animal = factory.createAnimal(animalType, cell);
                 animal.setAdult(true);
-                cell.animalsOnTheCell.add(animal);
+                cell.addAnimal(animal);
             }
         }
     }

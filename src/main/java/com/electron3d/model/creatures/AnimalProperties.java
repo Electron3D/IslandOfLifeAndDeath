@@ -3,14 +3,14 @@ package com.electron3d.model.creatures;
 import java.util.Map;
 
 public final class AnimalProperties {
-    private final String type;
+    private final AnimalType type;
     private final double weight;
     private final int range;
     private final int boundOnTheSameField;
     private final double amountOfFoodToBeFull;
     private final Map<String, Double> chancesToEat;
 
-    public AnimalProperties(String type, double weight, int range, int boundOnTheSameField, double amountOfFoodToBeFull, Map<String, Double> chancesToEat) {
+    public AnimalProperties(AnimalType type, double weight, int range, int boundOnTheSameField, double amountOfFoodToBeFull, Map<String, Double> chancesToEat) {
         this.type = type;
         this.weight = weight;
         this.range = range;
@@ -19,7 +19,7 @@ public final class AnimalProperties {
         this.chancesToEat = chancesToEat;
     }
 
-    public String getType() {
+    public AnimalType getType() {
         return type;
     }
 

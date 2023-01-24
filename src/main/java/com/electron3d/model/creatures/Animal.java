@@ -20,7 +20,7 @@ public abstract class Animal {
     public Animal(AnimalProperties properties, Cell currentLocation) {
         this.properties = properties;
         this.fullEnoughLevel = properties.getAmountOfFoodToBeFull() / 3;
-        this.startedHealthPoints = (int) (properties.getWeight() - properties.getAmountOfFoodToBeFull() * 1000);
+        this.startedHealthPoints = (int) ((properties.getWeight() - properties.getAmountOfFoodToBeFull()) * 1000);
         this.currentHealthPoints = startedHealthPoints;
         this.currentLocation = currentLocation;
     }
@@ -77,10 +77,10 @@ public abstract class Animal {
 
     private List<Eatable> getFoodListFromCell() {
         return Stream.concat(
-                currentLocation.animalsOnTheCell.stream()
+                currentLocation.getAnimalsOnTheCellCopy().stream()
                         .filter(x -> x instanceof Eatable)
                         .map(x -> (Eatable) x),
-                currentLocation.plantsOnTheCell.stream()
+                currentLocation.getPlantsOnTheCellCopy().stream()
                         .map(x -> (Eatable) x)
         ).toList();
     }
@@ -91,14 +91,15 @@ public abstract class Animal {
 
     public void walk(Cell destinationCell) {
         destinationCell.addAnimal(this);
-        currentLocation.deleteAnimal(this);
+        //currentLocation.deleteAnimal(this); //todo fix concurrentModificationException
         previousLocation = currentLocation;
         currentLocation = destinationCell;
-        System.out.println(this + " move from " + previousLocation + " to " + currentLocation);
+        //System.out.println(this + " move from " + previousLocation + " to " + currentLocation);
     }
 
     private Cell chooseDirection() {
-        Cell destinationCell = currentLocation.possibleWays.get(new Random().nextInt(0, currentLocation.possibleWays.size()));
+        List<Cell> possibleWays = currentLocation.getCopyOfPossibleWays();
+        Cell destinationCell = possibleWays.get(new Random().nextInt(0, possibleWays.size()));
         if (destinationCell != previousLocation) {
             return destinationCell;
         } else {
@@ -133,12 +134,16 @@ public abstract class Animal {
     }
 
     private boolean breed() {
-        List<Animal> animalsSameType = currentLocation.animalsOnTheCell.parallelStream()
+        List<Animal> animalsSameType = currentLocation.getAnimalsOnTheCellCopy()
+                .parallelStream()
                 .filter(a -> a.properties.getType().equals(this.properties.getType()))
                 .toList();
         int numberOfAnimalsSameType = animalsSameType.size();
         if (numberOfAnimalsSameType < properties.getBoundOnTheSameField()) {
-            return animalsSameType.parallelStream().filter(x -> x.isAdult).count() > 2;
+            return animalsSameType
+                    .parallelStream()
+                    .filter(x -> x.isAdult)
+                    .count() > 2;
         } else {
             return false;
         }

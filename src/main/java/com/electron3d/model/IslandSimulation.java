@@ -2,8 +2,10 @@ package com.electron3d.model;
 
 import com.electron3d.model.config.AnimalsConfig;
 import com.electron3d.model.config.IslandSimulationConfig;
+import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.island.Island;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class IslandSimulation {
@@ -19,7 +21,7 @@ public class IslandSimulation {
         island = new Island(
                 islandSimulationConfig.getIslandDimensions().getXDimension(),
                 islandSimulationConfig.getIslandDimensions().getYDimension(),
-                animalTypes);
+                Arrays.stream(AnimalType.values()).toList());
         System.out.println("The island created");
         System.out.println("Initialization...");
         island.initCells();

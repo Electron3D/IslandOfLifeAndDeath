@@ -12,6 +12,6 @@ public class Boar extends HerbivoresAndCaterpillarEatingAnimal implements Eatabl
 
     @Override
     public double restoreHP() {
-        return 0;
+        return getProperties().getWeight();
     }
 }

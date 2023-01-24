@@ -12,6 +12,6 @@ public class Mouse extends HerbivoresAndCaterpillarEatingAnimal implements Eatab
 
     @Override
     public double restoreHP() {
-        return 0;
+        return getProperties().getWeight();
     }
 }

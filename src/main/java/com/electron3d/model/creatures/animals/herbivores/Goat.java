@@ -13,6 +13,6 @@ public class Goat extends HerbivoresAnimal implements Eatable {
 
     @Override
     public double restoreHP() {
-        return 0;
+        return getProperties().getWeight();
     }
 }

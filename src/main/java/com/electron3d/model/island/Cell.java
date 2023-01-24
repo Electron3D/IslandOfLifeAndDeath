@@ -1,25 +1,19 @@
 package com.electron3d.model.island;
 
 import com.electron3d.model.config.AnimalsConfig;
-import com.electron3d.model.creatures.Animal;
-import com.electron3d.model.creatures.AnimalFactory;
-import com.electron3d.model.creatures.Plant;
-import com.electron3d.model.creatures.PlantProperties;
+import com.electron3d.model.creatures.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Cell {
-
-    //todo private modifiers and correct access for collections
-    public final Set<Animal> animalsOnTheCell = new HashSet<>();
-    public final List<Plant> plantsOnTheCell = new ArrayList<>();
-    public final List<Cell> possibleWays = new ArrayList<>();
+    private final Set<Animal> animalsOnTheCell = new HashSet<>();
+    private final List<Plant> plantsOnTheCell = new ArrayList<>();
+    private final List<Cell> possibleWays = new ArrayList<>();
     private final List<Animal> graveYard = new ArrayList<>();
     private int newBornAnimalsCounter;
     private final int x;
     private final int y;
-
     public Cell(int x, int y) {
         this.x = x;
         this.y = y;
@@ -41,7 +35,6 @@ public class Cell {
     public void doAnimalStuff() {
         List<Animal> diedAnimalsToday = new ArrayList<>();
         List<Animal> newBornAnimalsToday = new ArrayList<>();
-        //todo redo with iterator?? concurrent modification exception
         for (Animal animal : animalsOnTheCell) {
             boolean breedSucceed = animal.liveADay();
             if (animal.isDead()) {
@@ -82,6 +75,12 @@ public class Cell {
         }
     }
 
+    public void addPlant(Plant plantToAdd) {
+        synchronized (plantsOnTheCell) {
+            plantsOnTheCell.add(plantToAdd);
+        }
+    }
+
     public void deletePlant(Plant plantToDelete) {
         synchronized (plantsOnTheCell) {
             plantsOnTheCell.remove(plantToDelete);
@@ -93,15 +92,32 @@ public class Cell {
             animalsOnTheCell.add(animalToAdd);
         }
     }
-
     public void deleteAnimal(Animal animalToDelete) {
         synchronized (animalsOnTheCell) {
             animalsOnTheCell.remove(animalToDelete);
         }
     }
 
+    public void addPossibleWays(List<Cell> possibleWaysToAdd) {
+        synchronized (possibleWays) {
+            possibleWays.addAll(possibleWaysToAdd);
+        }
+    }
+
     public Animal getTheOldestAnimal() {
         return animalsOnTheCell.parallelStream().max(Comparator.comparingInt(Animal::getDaysAliveCounter)).orElseThrow();
+    }
+
+    public Set<Animal> getAnimalsOnTheCellCopy() {
+        return Set.copyOf(animalsOnTheCell);
+    }
+
+    public List<Plant> getPlantsOnTheCellCopy() {
+        return List.copyOf(plantsOnTheCell);
+    }
+
+    public List<Cell> getCopyOfPossibleWays() {
+        return List.copyOf(possibleWays);
     }
 
     public int getGraveYardSize() {

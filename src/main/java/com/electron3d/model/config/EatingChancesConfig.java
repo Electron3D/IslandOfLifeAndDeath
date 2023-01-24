@@ -1,5 +1,7 @@
 package com.electron3d.model.config;
 
+import com.electron3d.model.creatures.AnimalType;
+
 import java.util.*;
 
 /**
@@ -8,7 +10,7 @@ import java.util.*;
 public class EatingChancesConfig extends Config {
     private static EatingChancesConfig INSTANCE;
 
-    private final Map<String, Map<String, Double>> eatingChancesForAllAnimals = new HashMap<>();
+    private final Map<AnimalType, Map<String, Double>> eatingChancesForAllAnimals = new HashMap<>();
 
     public static EatingChancesConfig getInstance() {
         if (INSTANCE == null) {
@@ -21,7 +23,7 @@ public class EatingChancesConfig extends Config {
     private EatingChancesConfig() {
 
     }
-    public Map<String, Map<String, Double>> getEatingChancesForAllAnimals() {
+    public Map<AnimalType, Map<String, Double>> getEatingChancesForAllAnimals() {
         return eatingChancesForAllAnimals;
     }
 
@@ -42,18 +44,19 @@ public class EatingChancesConfig extends Config {
             toReturn.getEatingChancesForAllAnimals().putAll(Objects.requireNonNull(parseLines(lines)));
         }
 
-        private Map<String, Map<String, Double>> parseLines(List<String> lines) {
-            Map<String, Map<String, Double>> eatingChancesForAllAnimals = new HashMap<>();
+        private Map<AnimalType, Map<String, Double>> parseLines(List<String> lines) {
+            Map<AnimalType, Map<String, Double>> eatingChancesForAllAnimals = new HashMap<>();
             List<String> foodNames = getFoodNamesFrom(lines);
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
                 List<String> values = parseLine(line);
-                String type = values.get(0);
+                String typeName = values.get(0);
+                AnimalType type = Arrays.stream(AnimalType.values()).filter(x -> typeName.equals(x.getType())).findFirst().get();
                 Map<String, Double> eatChances = new HashMap<>();
                 for (int j = 1; j < values.size(); j++) {
                     String foodName = foodNames.get(j);
                     String value = values.get(j);
-                    if (!foodName.equals(type)) {
+                    if (!foodName.equals(type.getType())) {
                         eatChances.put(foodName, Double.parseDouble(value) / 100);
                     }
                 }

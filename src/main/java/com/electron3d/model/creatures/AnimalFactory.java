@@ -8,9 +8,9 @@ import com.electron3d.model.island.Cell;
 import java.util.List;
 
 public class AnimalFactory {
-    public Animal createAnimal(String animalType, Cell location) {
+    public Animal createAnimal(AnimalType animalType, Cell location) {
         List<AnimalProperties> allProperties = AnimalsConfig.getInstance().getAnimalsProperties();
-        return switch (animalType.trim().toLowerCase()) {
+        return switch (animalType.getType().trim().toLowerCase()) {
             case "boar" -> new Boar(getAnimalPropertiesForType(animalType, allProperties), location);
             case "buffalo" -> new Buffalo(getAnimalPropertiesForType(animalType, allProperties), location);
             case "caterpillar" -> new Caterpillar(getAnimalPropertiesForType(animalType, allProperties), location);
@@ -30,7 +30,7 @@ public class AnimalFactory {
         };
     }
 
-    private AnimalProperties getAnimalPropertiesForType(String animalType, List<AnimalProperties> allProperties) {
+    private AnimalProperties getAnimalPropertiesForType(AnimalType animalType, List<AnimalProperties> allProperties) {
         return allProperties
                 .stream()
                 .filter(x -> animalType.equals(x.getType()))

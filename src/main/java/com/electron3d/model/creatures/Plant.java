@@ -6,9 +6,9 @@ import java.util.Random;
 
 public class Plant implements Eatable {
     private final PlantProperties properties;
-
     private final Cell location;
     private int plantGrowth;
+
     public Plant(PlantProperties properties, Cell location) {
         this.properties = properties;
         this.location = location;

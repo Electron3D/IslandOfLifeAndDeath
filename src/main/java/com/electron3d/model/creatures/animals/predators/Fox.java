@@ -13,6 +13,6 @@ public class Fox  extends PredatorAnimal implements Eatable {
 
     @Override
     public double restoreHP() {
-        return 0;
+        return getProperties().getWeight();
     }
 }

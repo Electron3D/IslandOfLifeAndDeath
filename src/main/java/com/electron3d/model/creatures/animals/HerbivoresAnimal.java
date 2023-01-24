@@ -1,9 +1,6 @@
 package com.electron3d.model.creatures.animals;
 
-import com.electron3d.model.creatures.Animal;
-import com.electron3d.model.creatures.AnimalProperties;
-import com.electron3d.model.creatures.Eatable;
-import com.electron3d.model.creatures.Plant;
+import com.electron3d.model.creatures.*;
 import com.electron3d.model.island.Cell;
 
 import java.util.List;
@@ -37,6 +34,7 @@ public abstract class HerbivoresAnimal extends Animal implements Herbivores {
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = food.restoreHP();
+            //System.out.println("Animal " + this + " eat " + food);
             getCurrentLocation().deletePlant(food);
         }
         if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {

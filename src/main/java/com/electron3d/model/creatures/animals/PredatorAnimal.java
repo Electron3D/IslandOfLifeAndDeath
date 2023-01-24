@@ -2,6 +2,7 @@ package com.electron3d.model.creatures.animals;
 
 import com.electron3d.model.creatures.Animal;
 import com.electron3d.model.creatures.AnimalProperties;
+import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.creatures.Eatable;
 import com.electron3d.model.island.Cell;
 
@@ -33,10 +34,12 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
     public double hunt(Animal food) {
         Random chanceToEat = new Random();
         Eatable exactFood = (Eatable) food;
-        double chance = getProperties().getChancesToEat(food.getProperties().getType());
+        AnimalType foodType = food.getProperties().getType();
+        double chance = getProperties().getChancesToEat(foodType.getType()); //todo fix nullPointerException why???
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = exactFood.restoreHP();
+            //System.out.println("Animal " + this + " eat " + food);
             food.setDead(true);
             if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
                 if (currentHealthPoints + restoredHP <= startedHealthPoints) {
