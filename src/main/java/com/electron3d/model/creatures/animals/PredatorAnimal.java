@@ -39,7 +39,7 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
         Random chanceToEat = new Random();
         Eatable exactFood = (Eatable) food;
         AnimalType foodType = food.getProperties().getType();
-        double chance = getProperties().getChancesToEat(foodType.getType()); //todo fix nullPointerException why???
+        double chance = getProperties().getChancesToEat(foodType.getType());
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = exactFood.restoreHP();
