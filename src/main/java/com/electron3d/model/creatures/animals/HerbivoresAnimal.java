@@ -13,7 +13,10 @@ public abstract class HerbivoresAnimal extends Animal implements Herbivores {
 
     @Override
     public Eatable findFood(List<Eatable> foodList) {
-        return foodList.parallelStream().filter(x -> x instanceof Plant).findFirst().orElse(null);
+        return foodList.parallelStream()
+                .filter(x -> x instanceof Plant)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -34,7 +37,6 @@ public abstract class HerbivoresAnimal extends Animal implements Herbivores {
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = food.restoreHP();
-            //System.out.println("Animal " + this + " eat " + food);
             getCurrentLocation().deletePlant(food);
         }
         if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {

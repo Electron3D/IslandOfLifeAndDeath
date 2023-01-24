@@ -15,12 +15,12 @@ public class Plant implements Eatable {
     }
 
     public int grow() {
-        if (plantGrowth >= 3) {
+        if (plantGrowth >= 1) {
             int boundOnTheSameField = properties.getBoundOnTheSameField();
-            int amount = location.getAmountOfPlantsOnTheField();
+            int amount = location.getAmountOfPlantsOnTheCell();
             if (amount > 0 && amount < boundOnTheSameField) {
                 Random random = new Random();
-                int numberOfNewGrownPlants = random.nextInt(0, 3);
+                int numberOfNewGrownPlants = random.nextInt(0, 10);
                 int newAmount = amount + numberOfNewGrownPlants;
                 if (newAmount > boundOnTheSameField) {
                     return boundOnTheSameField - amount;

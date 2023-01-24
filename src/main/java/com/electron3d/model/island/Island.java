@@ -51,7 +51,11 @@ public class Island {
         List<AnimalProperties> animalsProperties = AnimalsConfig.getInstance().getAnimalsProperties();
         AnimalFactory factory = new AnimalFactory();
         for (AnimalType animalType : animalTypes) {
-            AnimalProperties animalProperties = animalsProperties.stream().filter(x -> animalType.equals(x.getType())).findFirst().orElseThrow();
+            AnimalProperties animalProperties = animalsProperties
+                    .stream()
+                    .filter(x -> animalType.equals(x.getType()))
+                    .findFirst()
+                    .orElseThrow();
             int startingAnimalsCount = startingAnimalsCountChooser.nextInt(animalProperties.getBoundOnTheSameField() + 1);
             for (int i = 0; i < startingAnimalsCount; i++) {
                 Animal animal = factory.createAnimal(animalType, cell);
@@ -81,9 +85,13 @@ public class Island {
         for (int y = 0; y < cells.length; y++) {
             for (int x = 0; x < cells[y].length; x++) {
                 Cell cell = cells[y][x];
+                if (cell.getAmountOfAnimalsOnTheCell() <= 0) {
+                    continue;
+                }
                 cell.growPlants();
                 cell.doAnimalStuff();
                 cell.decomposeTheCorpses();
+                cell.setNewDay();
             }
         }
     }
@@ -94,11 +102,16 @@ public class Island {
         int totalNumberOfDeadAnimals = 0;
         int totalNumberOfNewBornAnimals = 0;
         Animal theOldestAnimal = getTheOldestAnimal();
+        if (theOldestAnimal == null) {
+            System.out.println("All are dead!");
+            return;
+        }
+        String theOldestAnimalName = theOldestAnimal.toString().substring(theOldestAnimal.toString().indexOf(theOldestAnimal.getClass().getSimpleName()));
         for (int y = 0; y < cells.length; y++) {
             for (int x = 0; x < cells[y].length; x++) {
                 Cell cell = cells[y][x];
                 totalNumberOfAnimals = totalNumberOfAnimals + cell.getAmountOfAnimalsOnTheCell();
-                totalNumberOfPlants = totalNumberOfPlants + cell.getAmountOfPlantsOnTheField();
+                totalNumberOfPlants = totalNumberOfPlants + cell.getAmountOfPlantsOnTheCell();
                 totalNumberOfDeadAnimals = totalNumberOfDeadAnimals + cell.getGraveYardSize();
                 totalNumberOfNewBornAnimals = totalNumberOfNewBornAnimals + cell.getNewBornAnimalsCounter();
             }
@@ -107,16 +120,27 @@ public class Island {
         System.out.println("Animals total: " + totalNumberOfAnimals);
         System.out.println("Animals died: " + totalNumberOfDeadAnimals);
         System.out.println("Were born " + totalNumberOfNewBornAnimals + " animals in total.");
-        System.out.println("The oldest animal is: " + theOldestAnimal + " lives already " + theOldestAnimal.getDaysAliveCounter() + " days.");
+        System.out.println("The oldest animal is: " + theOldestAnimalName + " lives already " + theOldestAnimal.getDaysAliveCounter() + " days.");
     }
 
     private Animal getTheOldestAnimal() {
-        Animal animal = cells[0][0].getTheOldestAnimal();
+        Cell startedCell = Arrays.stream(cells)
+                .flatMap(array -> Arrays.stream(array)
+                        .filter(cell -> cell.getAmountOfAnimalsOnTheCell() > 0))
+                .findFirst()
+                .orElse(null);
+        if (startedCell == null) {
+            return null;
+        }
+        Animal animal = startedCell.getTheOldestAnimal();
         int daysAlive = animal.getDaysAliveCounter();
         for (int y = 0; y < cells.length; y++) {
             for (int x = 1; x < cells[y].length; x++) {
                 Cell cell = cells[y][x];
                 Animal animalToCompare = cell.getTheOldestAnimal();
+                if (animalToCompare == null) {
+                    return animal;
+                }
                 if (daysAlive < animalToCompare.getDaysAliveCounter()) {
                     animal = animalToCompare;
                 }
@@ -137,10 +161,19 @@ public class Island {
                 if (cell.getY() < 10) {
                     cellsToString.append(" ");
                 }
-                if (cell.getAmountOfPlantsOnTheField() < 10) {
+                if (cell.getAmountOfPlantsOnTheCell() < 10) {
                     cellsToString.append(" ");
                 }
-                if (cell.getAmountOfPlantsOnTheField() < 100) {
+                if (cell.getAmountOfPlantsOnTheCell() < 100) {
+                    cellsToString.append(" ");
+                }
+                if (cell.getAmountOfAnimalsOnTheCell() < 10) {
+                    cellsToString.append(" ");
+                }
+                if (cell.getAmountOfAnimalsOnTheCell() < 100) {
+                    cellsToString.append(" ");
+                }
+                if (cell.getAmountOfAnimalsOnTheCell() < 1000) {
                     cellsToString.append(" ");
                 }
             }
@@ -150,7 +183,7 @@ public class Island {
                 "parallelLength=" + xDimension +
                 ", meridianLength=" + yDimension +
                 ", cells=\n" + cellsToString +
-                "}";
+                "}\n";
     }
 }
 

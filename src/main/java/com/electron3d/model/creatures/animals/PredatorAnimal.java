@@ -16,7 +16,11 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
 
     @Override
     public Eatable findFood(List<Eatable> foodList) {
-        return foodList.parallelStream().filter(x -> x instanceof Animal).findFirst().orElse(null);
+        return foodList.parallelStream()
+                .filter(x -> x instanceof Animal)
+                .filter(y -> ((Animal) y).getProperties().getType() != this.getProperties().getType())
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -39,7 +43,6 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = exactFood.restoreHP();
-            //System.out.println("Animal " + this + " eat " + food);
             food.setDead(true);
             if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
                 if (currentHealthPoints + restoredHP <= startedHealthPoints) {

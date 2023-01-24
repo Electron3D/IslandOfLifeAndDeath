@@ -1,20 +1,16 @@
 package com.electron3d.model;
 
-import com.electron3d.model.config.AnimalsConfig;
 import com.electron3d.model.config.IslandSimulationConfig;
 import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.island.Island;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class IslandSimulation {
     private Island island;
 
     public void init() {
         System.out.println("Loading configuration...");
-        AnimalsConfig animalsConfig = AnimalsConfig.getInstance();
-        List<String> animalTypes = animalsConfig.getAnimalsTypes();
         IslandSimulationConfig islandSimulationConfig = IslandSimulationConfig.getInstance();
         System.out.println("Configuration loaded");
         System.out.println("Creating an island...");

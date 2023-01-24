@@ -14,9 +14,10 @@ public abstract class Animal {
     private int daysAliveCounter;
     private boolean isAdult;
     private boolean isDead;
+    private boolean walkedToday;
     private Cell previousLocation;
-    private Cell currentLocation;
 
+    private Cell currentLocation;
     public Animal(AnimalProperties properties, Cell currentLocation) {
         this.properties = properties;
         this.fullEnoughLevel = properties.getAmountOfFoodToBeFull() / 3;
@@ -24,12 +25,15 @@ public abstract class Animal {
         this.currentHealthPoints = startedHealthPoints;
         this.currentLocation = currentLocation;
     }
-
     /**
      * Collect the results of the day from trying to satisfyNeeds method
      * that depend on if the animal still alive or die and if it bred successfully.
      */
     public boolean liveADay() {
+        walkedToday = true;
+        if (isDead) {
+            return false;
+        }
         boolean success = roamInSearchOfFood();
         feelHunger();
         if (currentHealthPoints <= 0) {
@@ -90,18 +94,21 @@ public abstract class Animal {
     public abstract Eatable findFood(List<Eatable> foodList);
 
     public void walk(Cell destinationCell) {
-        destinationCell.addAnimal(this);
-        //currentLocation.deleteAnimal(this); //todo fix concurrentModificationException
+        this.currentLocation.deleteAnimal(this); //todo fix concurrentModificationException
         previousLocation = currentLocation;
         currentLocation = destinationCell;
-        //System.out.println(this + " move from " + previousLocation + " to " + currentLocation);
+        this.currentLocation.addAnimal(this);
     }
 
     private Cell chooseDirection() {
         List<Cell> possibleWays = currentLocation.getCopyOfPossibleWays();
         Cell destinationCell = possibleWays.get(new Random().nextInt(0, possibleWays.size()));
         if (destinationCell != previousLocation) {
-            return destinationCell;
+            if (destinationCell.getAmountOfAnimalsOnTheCell() < getProperties().getBoundOnTheSameField()) {
+                return destinationCell;
+            } else {
+                return this.currentLocation;
+            }
         } else {
             return chooseDirection();
         }
@@ -110,6 +117,7 @@ public abstract class Animal {
     private void feelHunger() {
         currentHealthPoints = currentHealthPoints - starvation * 2;
     }
+
     /**
      * The animal has a chance to reset scale of starvation to 0 or just to one point below.
      * Dice will be rolled to decide the fait.
@@ -135,20 +143,19 @@ public abstract class Animal {
 
     private boolean breed() {
         List<Animal> animalsSameType = currentLocation.getAnimalsOnTheCellCopy()
-                .parallelStream()
+                .stream()
                 .filter(a -> a.properties.getType().equals(this.properties.getType()))
                 .toList();
         int numberOfAnimalsSameType = animalsSameType.size();
         if (numberOfAnimalsSameType < properties.getBoundOnTheSameField()) {
             return animalsSameType
-                    .parallelStream()
+                    .stream()
                     .filter(x -> x.isAdult)
                     .count() > 2;
         } else {
             return false;
         }
     }
-
     private void growUp() {
         daysAliveCounter++;
         if (daysAliveCounter > 7) {
@@ -178,5 +185,13 @@ public abstract class Animal {
 
     public void setDead(boolean dead) {
         isDead = dead;
+    }
+
+    public boolean isWalkedToday() {
+        return walkedToday;
+    }
+
+    public void setWalkedToday(boolean walkedToday) {
+        this.walkedToday = walkedToday;
     }
 }
