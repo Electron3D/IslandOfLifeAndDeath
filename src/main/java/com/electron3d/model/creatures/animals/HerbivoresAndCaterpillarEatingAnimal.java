@@ -17,10 +17,17 @@ public abstract class HerbivoresAndCaterpillarEatingAnimal extends HerbivoresAni
 
     @Override
     public Eatable findFood(List<Eatable> foodList) {
-        return foodList.parallelStream().filter(x -> x instanceof Plant).findFirst().orElse(findCaterpillar(foodList));
+        return foodList.parallelStream()
+                .filter(x -> x instanceof Plant)
+                .findFirst()
+                .orElse(findCaterpillar(foodList));
     }
     public Eatable findCaterpillar(List<Eatable> foodList) {
-        return foodList.parallelStream().filter(x -> x instanceof Caterpillar).findFirst().orElse(null);
+        return foodList.parallelStream()
+                .filter(x -> x instanceof Caterpillar)
+                .filter(y -> !((Caterpillar) y).isDead())
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -48,7 +55,7 @@ public abstract class HerbivoresAndCaterpillarEatingAnimal extends HerbivoresAni
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = exactFood.restoreHP();
-            getCurrentLocation().deleteAnimal(exactFood);
+            exactFood.setDead(true);
             if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
                 if (currentHealthPoints + restoredHP <= startedHealthPoints) {
                     return restoredHP;

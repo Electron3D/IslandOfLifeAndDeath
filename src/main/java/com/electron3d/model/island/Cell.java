@@ -7,6 +7,7 @@ import com.electron3d.model.creatures.Plant;
 import com.electron3d.model.creatures.PlantProperties;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Cell {
 
@@ -41,7 +42,7 @@ public class Cell {
         List<Animal> diedAnimalsToday = new ArrayList<>();
         List<Animal> newBornAnimalsToday = new ArrayList<>();
         //todo redo with iterator?? concurrent modification exception
-        animalsOnTheCell.forEach(animal -> {
+        for (Animal animal : animalsOnTheCell) {
             boolean breedSucceed = animal.liveADay();
             if (animal.isDead()) {
                 diedAnimalsToday.add(animal);
@@ -51,9 +52,14 @@ public class Cell {
                 Animal animalToAdd = factory.createAnimal(animal.getProperties().getType(), animal.getCurrentLocation());
                 newBornAnimalsToday.add(animalToAdd);
             }
-        });
+        }
         buryAnimals(diedAnimalsToday);
         releaseNewBornAnimals(newBornAnimalsToday);
+    }
+
+    public void decomposeTheCorpses() {
+        List<Animal> deadAnimals = animalsOnTheCell.stream().filter(Animal::isDead).toList();
+        buryAnimals(deadAnimals);
     }
 
     private void releaseNewBornAnimals(List<Animal> newBornAnimalsToday) {

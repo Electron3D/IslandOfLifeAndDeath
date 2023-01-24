@@ -37,7 +37,7 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = exactFood.restoreHP();
-            getCurrentLocation().deleteAnimal(food);
+            food.setDead(true);
             if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
                 if (currentHealthPoints + restoredHP <= startedHealthPoints) {
                     return restoredHP;

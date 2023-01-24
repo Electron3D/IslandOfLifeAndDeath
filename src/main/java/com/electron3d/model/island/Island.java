@@ -83,6 +83,7 @@ public class Island {
                 Cell cell = cells[y][x];
                 cell.growPlants();
                 cell.doAnimalStuff();
+                cell.decomposeTheCorpses();
             }
         }
     }

@@ -55,19 +55,21 @@ public abstract class Animal {
     }
 
     /**
-     * In this method an animal tries to eat and if there isn't food it tries to find it in another field.
+     * An animal keep roaming from cell to cell until it finds food or the number of steps left ends.
      */
     private boolean roamInSearchOfFood() {
         int numberOfStepsLeft = properties.getRange();
         boolean success;
-        while (numberOfStepsLeft >= 0) {
+        while (true) {
             Eatable food = findFood(getFoodListFromCell());
             if (food != null) {
                 success = eat(food);
                 return success;
             } else {
-                walk(chooseDirection());
-                numberOfStepsLeft--;
+                if (numberOfStepsLeft > 0) {
+                    walk(chooseDirection());
+                    numberOfStepsLeft--;
+                } else break;
             }
         }
         return false;
@@ -103,10 +105,10 @@ public abstract class Animal {
             return chooseDirection();
         }
     }
+
     private void feelHunger() {
         currentHealthPoints = currentHealthPoints - starvation * 2;
     }
-
     /**
      * The animal has a chance to reset scale of starvation to 0 or just to one point below.
      * Dice will be rolled to decide the fait.
@@ -167,5 +169,9 @@ public abstract class Animal {
 
     public boolean isDead() {
         return isDead;
+    }
+
+    public void setDead(boolean dead) {
+        isDead = dead;
     }
 }
