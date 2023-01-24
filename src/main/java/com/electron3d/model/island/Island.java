@@ -48,14 +48,11 @@ public class Island {
 
     private void initAnimals(Cell cell) {
         Random startingAnimalsCountChooser = new Random();
-        List<AnimalProperties> animalsProperties = AnimalsConfig.getInstance().getAnimalsProperties();
+        AnimalsConfig config = AnimalsConfig.getInstance();
+        List<AnimalProperties> animalsProperties = config.getAnimalsProperties();
         AnimalFactory factory = new AnimalFactory();
         for (AnimalType animalType : animalTypes) {
-            AnimalProperties animalProperties = animalsProperties
-                    .stream()
-                    .filter(x -> animalType.equals(x.getType()))
-                    .findFirst()
-                    .orElseThrow();
+            AnimalProperties animalProperties = config.getAnimalPropertiesForType(animalType, animalsProperties);
             int startingAnimalsCount = startingAnimalsCountChooser.nextInt(animalProperties.getBoundOnTheSameField() + 1);
             for (int i = 0; i < startingAnimalsCount; i++) {
                 Animal animal = factory.createAnimal(animalType, cell);

@@ -36,6 +36,14 @@ public class AnimalsConfig extends Config {
         return animalsProperties;
     }
 
+    public AnimalProperties getAnimalPropertiesForType(AnimalType animalType, List<AnimalProperties> allProperties) {
+        return allProperties
+                .stream()
+                .filter(x -> animalType.equals(x.getType()))
+                .findFirst()
+                .orElseThrow();
+    }
+
     public PlantProperties getPlantProperties() {
         return plantProperties;
     }
