@@ -1,5 +1,6 @@
 package com.electron3d.model;
 
+import com.electron3d.engine.Renderer;
 import com.electron3d.model.config.IslandSimulationConfig;
 import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.island.Island;
@@ -21,12 +22,15 @@ public class IslandSimulation {
         System.out.println("The island created");
         System.out.println("Initialization...");
         island.initCells();
-        System.out.println("Initialization complete!");
-        System.out.println("\n \n \n");
+        System.out.println("Initialization complete!\n");
     }
 
-    public void simulate() {
-        island.live();
+    public boolean simulate() {
+        boolean isIslandDead = island.live();
+        Renderer renderer = new Renderer(this);
+        renderer.getSnapshotOfTheIsland();
+        renderer.printStats();
+        return isIslandDead;
     }
 
     public Island getIsland() {

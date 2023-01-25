@@ -79,7 +79,10 @@ public class Island {
         return possibleWays;
     }
 
-    public void live() {
+    public boolean live() {
+        if (!checkIsSmbAlive()) {
+            return true;
+        }
         for (int y = 0; y < cells.length; y++) {
             for (int x = 0; x < cells[y].length; x++) {
                 Cell cell = cells[y][x];
@@ -92,6 +95,17 @@ public class Island {
                 cell.setNewDay();
             }
         }
+        return false;
+    }
+
+    private boolean checkIsSmbAlive() {
+        return Arrays
+                .stream(cells)
+                .parallel()
+                .flatMap(cellsRow -> Arrays
+                        .stream(cellsRow)
+                        .map(Cell::getAmountOfAnimalsOnTheCell))
+                .reduce(Integer::sum).orElse(0) > 0;
     }
 
     public Cell[][] getCells() {
@@ -128,11 +142,11 @@ public class Island {
             }
             cellsToString.append("\n");
         }
-        return "Island\n{" +
-                "parallelLength=" + xDimension +
-                ", meridianLength=" + yDimension +
-                ", cells=\n" + cellsToString +
-                "}\n";
+        return "Island\n" +
+                "Parallel length = " + xDimension +
+                ", meridian length = " + yDimension +
+                ", cells =\n" + cellsToString +
+                "\n";
     }
 }
 

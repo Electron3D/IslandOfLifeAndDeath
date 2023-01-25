@@ -15,20 +15,23 @@ public class SimulationEngine {
     }
 
     public void start() {
-        Renderer renderer = new Renderer(simulation);
         simulation.init();
+        Renderer renderer = new Renderer(simulation);
         renderer.printStartSimulationConditions();
 
         while (timer != maxTimeOfSimulationInSeconds) {
             timer++;
             renderer.printCurrentDay(timer);
-            simulation.simulate();
+            boolean isSimulationEnded = simulation.simulate();
+            if (isSimulationEnded) {
+                break;
+            }
             try {
                 Thread.sleep(1000 / timeFlowSpeedMultiplier);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        renderer.printSimulationResults();
+        renderer.printSimulationResults(timer);
     }
 }

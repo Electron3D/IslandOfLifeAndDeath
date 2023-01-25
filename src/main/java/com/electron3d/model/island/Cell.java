@@ -46,7 +46,14 @@ public class Cell {
             if (breedSucceed) {
                 AnimalFactory factory = new AnimalFactory();
                 Animal animalToAdd = factory.createAnimal(animal.getProperties().getType(), animal.getCurrentLocation());
-                newBornAnimalsToday.add(animalToAdd);
+                long amountOfAnimalsThisTypeOnCell = animalsOnTheCell
+                        .stream()
+                        .filter(a -> a.getProperties().getType().equals(animalToAdd.getProperties().getType()))
+                        .count();
+                int boundOfThisTypeAnimalOnCell = animalToAdd.getProperties().getBoundOnTheSameField();
+                if (amountOfAnimalsThisTypeOnCell + newBornAnimalsToday.size() + 1 < boundOfThisTypeAnimalOnCell) {
+                    newBornAnimalsToday.add(animalToAdd);
+                }
             }
         }
         buryAnimals(diedAnimalsToday);

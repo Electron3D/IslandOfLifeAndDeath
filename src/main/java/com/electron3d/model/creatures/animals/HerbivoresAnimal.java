@@ -37,7 +37,6 @@ public abstract class HerbivoresAnimal extends Animal implements Herbivores {
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = food.restoreHP();
-            getCurrentLocation().deletePlant(food);
         }
         if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
             if (currentHealthPoints + restoredHP <= startedHealthPoints) {

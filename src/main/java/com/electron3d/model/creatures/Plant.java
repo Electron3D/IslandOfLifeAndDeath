@@ -5,13 +5,16 @@ import com.electron3d.model.island.Cell;
 import java.util.Random;
 
 public class Plant implements Eatable {
+    public final static String ICON = "\uD83C\uDF3F";
     private final PlantProperties properties;
     private final Cell location;
+    private double numberOfBerries;
     private int plantGrowth;
 
     public Plant(PlantProperties properties, Cell location) {
         this.properties = properties;
         this.location = location;
+        this.numberOfBerries = properties.getWeight() * 20;
     }
 
     public int grow() {
@@ -38,6 +41,10 @@ public class Plant implements Eatable {
 
     @Override
     public double restoreHP() {
+        numberOfBerries--;
+        if (numberOfBerries == 0) {
+            this.location.deletePlant(this);
+        }
         return properties.getWeight();
     }
 

@@ -26,8 +26,7 @@ public abstract class Animal {
         this.currentLocation = currentLocation;
     }
     /**
-     * Collect the results of the day from trying to satisfyNeeds method
-     * that depend on if the animal still alive or die and if it bred successfully.
+     *  Checking animal's state, launch fatigue effect and daily routine methods
      */
     public boolean liveADay() {
         walkedToday = true;
@@ -94,7 +93,7 @@ public abstract class Animal {
     public abstract Eatable findFood(List<Eatable> foodList);
 
     public void walk(Cell destinationCell) {
-        this.currentLocation.deleteAnimal(this); //todo fix concurrentModificationException
+        this.currentLocation.deleteAnimal(this);
         previousLocation = currentLocation;
         currentLocation = destinationCell;
         this.currentLocation.addAnimal(this);

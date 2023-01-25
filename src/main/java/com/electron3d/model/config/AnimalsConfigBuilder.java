@@ -58,7 +58,7 @@ public class AnimalsConfigBuilder {
             AnimalType type = null;
             double weight = -1;
             int range = -1;
-            int boundOnTheSameField = -1;
+            int boundOnTheSameCell = -1;
             double amountOfFoodToBeFull = -1;
             Map<String, Double> chancesToEat = new HashMap<>();
             String[] values = line.split(",");
@@ -71,11 +71,11 @@ public class AnimalsConfigBuilder {
                     }
                     case "weight" -> weight = Double.parseDouble(value);
                     case "range" -> range = Integer.parseInt(value);
-                    case "boundOnTheSameField" -> boundOnTheSameField = Integer.parseInt(value);
+                    case "boundOnTheSameCell" -> boundOnTheSameCell = Integer.parseInt(value);
                     case "amountOfFoodToBeFull" -> amountOfFoodToBeFull = Double.parseDouble(value);
                 }
             }
-            return new AnimalProperties(type, weight, range, boundOnTheSameField, amountOfFoodToBeFull, chancesToEat);
+            return new AnimalProperties(type, weight, range, boundOnTheSameCell, amountOfFoodToBeFull, chancesToEat);
         }).collect(Collectors.toList());
     }
 

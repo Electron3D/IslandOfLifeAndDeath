@@ -1,31 +1,31 @@
 package com.electron3d.model.creatures.animals;
 
-import com.electron3d.model.creatures.Animal;
 import com.electron3d.model.creatures.AnimalProperties;
+import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.creatures.Eatable;
 import com.electron3d.model.creatures.Plant;
-import com.electron3d.model.creatures.animals.herbivores.Caterpillar;
+import com.electron3d.model.creatures.animals.herbivores.Animal;
 import com.electron3d.model.island.Cell;
 
 import java.util.List;
 import java.util.Random;
 
-public abstract class HerbivoresAndCaterpillarEatingAnimal extends HerbivoresAnimal implements Predatory {
-    public HerbivoresAndCaterpillarEatingAnimal(AnimalProperties properties, Cell location) {
+public abstract class HerbivoresAndAccidentAnimalEatingAnimal extends HerbivoresAnimal implements Predatory {
+    public HerbivoresAndAccidentAnimalEatingAnimal(AnimalProperties properties, Cell location) {
         super(properties, location);
     }
 
     @Override
     public Eatable findFood(List<Eatable> foodList) {
         return foodList.parallelStream()
-                .filter(x -> x instanceof Caterpillar)
-                .filter(y -> !((Caterpillar) y).isDead())
-                .findFirst()
-                .orElse(findPlant(foodList));
-    }
-    public Eatable findPlant(List<Eatable> foodList) {
-        return foodList.parallelStream()
                 .filter(x -> x instanceof Plant)
+                .findFirst()
+                .orElse(findAnimal(foodList));
+    }
+    public Eatable findAnimal(List<Eatable> foodList) {
+        return foodList.parallelStream()
+                .filter(x -> x instanceof Animal)
+                .filter(y -> !((Animal) y).isDead())
                 .findFirst()
                 .orElse(null);
     }
@@ -36,7 +36,7 @@ public abstract class HerbivoresAndCaterpillarEatingAnimal extends HerbivoresAni
         if (food instanceof Plant plantToEat) {
             restoredHP = eatPlant(plantToEat);
         } else {
-            Caterpillar dessert = (Caterpillar) food;
+            Animal dessert = (Animal) food;
             restoredHP = hunt(dessert);
         }
         if (restoredHP == 0) {
@@ -48,15 +48,15 @@ public abstract class HerbivoresAndCaterpillarEatingAnimal extends HerbivoresAni
     }
 
     @Override
-    public double hunt(Animal food) {
+    public double hunt(com.electron3d.model.creatures.Animal food) {
         Random chanceToEat = new Random();
-        Caterpillar exactFood = (Caterpillar) food;
-        double chance = getProperties().getChancesToEat(exactFood.getProperties().getType().getType());
+        Eatable exactFood = (Eatable) food;
+        AnimalType foodType = food.getProperties().getType();
+        double chance = getProperties().getChancesToEat(foodType.getType());
         double restoredHP = 0;
-        double randomChance = chanceToEat.nextDouble(0, 1);
-        if (randomChance < chance) {
+        if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = exactFood.restoreHP();
-            exactFood.setDead(true);
+            food.setDead(true);
             if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
                 if (currentHealthPoints + restoredHP <= startedHealthPoints) {
                     return restoredHP;
