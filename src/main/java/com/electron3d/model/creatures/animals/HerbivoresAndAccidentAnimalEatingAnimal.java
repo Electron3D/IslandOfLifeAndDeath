@@ -17,7 +17,6 @@ public abstract class HerbivoresAndAccidentAnimalEatingAnimal extends Herbivores
             return Stream.concat(
                 this.getCurrentLocation().getAnimalsOnCellCopy()
                         .stream()
-                        .filter(x -> x instanceof Eatable)
                         .map(x -> (Eatable) x),
                 this.getCurrentLocation().getPlantsOnCellCopy()
                         .stream()

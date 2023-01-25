@@ -38,7 +38,8 @@ public abstract class Animal {
         if (currentHealthPoints <= 0) {
             isDead = die();
         }
-        if (success) {
+        if (success && !isDead) {
+            growUp();
             if (isAdult) {
                 return breed();
             } else {
@@ -50,11 +51,11 @@ public abstract class Animal {
             } else {
                 starvation++;
             }
+            if (!isDead) {
+                growUp();
+            }
+            return false;
         }
-        if (!isDead) {
-            growUp();
-        }
-        return false;
     }
 
     /**

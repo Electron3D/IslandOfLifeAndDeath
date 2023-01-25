@@ -18,7 +18,6 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
     protected List<Eatable> getFoodListFromCell() {
         return this.getCurrentLocation().getAnimalsOnCellCopy()
                 .stream()
-                .filter(x -> x instanceof Eatable)
                 .map(x -> (Eatable) x).toList();
     }
 
