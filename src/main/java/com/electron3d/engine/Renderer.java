@@ -1,6 +1,7 @@
 package com.electron3d.engine;
 
 import com.electron3d.model.IslandSimulation;
+import com.electron3d.model.config.IslandSimulationConfig;
 import com.electron3d.model.creatures.Animal;
 import com.electron3d.model.island.Cell;
 import com.electron3d.model.island.Island;
@@ -19,7 +20,15 @@ public class Renderer {
     }
 
     public void printStartSimulationConditions() {
+        IslandSimulationConfig islandSimulationConfig = IslandSimulationConfig.getInstance();
+        int maxTimer = islandSimulationConfig.getMaxTimeOfSimulationInSeconds();
+        int timeFlowSpeedMultiplier = islandSimulationConfig.getTimeMultiplier();
+        System.out.println("Starting condition:");
+        System.out.println("");
+    }
 
+    public void printCurrentDay(int timer) {
+        System.out.print("Day: " + timer);
     }
 
     public void snapshotOfTheIsland() {
@@ -28,6 +37,8 @@ public class Renderer {
     }
 
     public void printSimulationResults() {
+        System.out.println("Time is over! Final results:");
+        addSpaces();
 
     }
 
@@ -82,5 +93,9 @@ public class Renderer {
             }
         }
         return animal;
+    }
+
+    private void addSpaces() {
+        System.out.println("\n\n\n");
     }
 }

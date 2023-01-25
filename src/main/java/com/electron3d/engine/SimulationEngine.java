@@ -4,36 +4,31 @@ import com.electron3d.model.IslandSimulation;
 
 public class SimulationEngine {
     private final IslandSimulation simulation;
-    private final int timeMultiplier;
+    private final int timeFlowSpeedMultiplier;
     private final int maxTimeOfSimulationInSeconds;
     private int timer;
 
-    public SimulationEngine(IslandSimulation simulation, int timeMultiplier, int maxTimeOfSimulationInSeconds) {
+    public SimulationEngine(IslandSimulation simulation, int timeFlowSpeedMultiplier, int maxTimeOfSimulationInSeconds) {
         this.simulation = simulation;
-        this.timeMultiplier = timeMultiplier;
+        this.timeFlowSpeedMultiplier = timeFlowSpeedMultiplier;
         this.maxTimeOfSimulationInSeconds = maxTimeOfSimulationInSeconds;
     }
 
     public void start() {
         Renderer renderer = new Renderer(simulation);
         simulation.init();
-        System.out.println("Starting condition:");
         renderer.printStartSimulationConditions();
-        System.out.println();
-        System.out.println();
-        System.out.println();
 
         while (timer != maxTimeOfSimulationInSeconds) {
-            System.out.println("Day: " + ++timer);
+            timer++;
+            renderer.printCurrentDay(timer);
             simulation.simulate();
             try {
-                Thread.sleep(1000 / timeMultiplier);
+                Thread.sleep(1000 / timeFlowSpeedMultiplier);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-
-        System.out.println("Time is over! Final results:");
-        simulation.printSimulationResults();
+        renderer.printSimulationResults();
     }
 }

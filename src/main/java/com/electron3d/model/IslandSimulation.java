@@ -27,17 +27,9 @@ public class IslandSimulation {
 
     public void simulate() {
         island.live();
-        System.out.println("Results are printing");
-        printSimulationResults();
-        System.out.println("\n \n \n");
     }
 
     public Island getIsland() {
         return island;
-    }
-
-    public void printSimulationResults() {
-        System.out.println(island);
-        island.printStats();
     }
 }
