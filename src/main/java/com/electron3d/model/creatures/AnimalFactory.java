@@ -14,7 +14,7 @@ public class AnimalFactory {
         return switch (animalType) {
             case BOAR -> new Boar(config.getAnimalPropertiesForType(animalType, allProperties), location);
             case BUFFALO -> new Buffalo(config.getAnimalPropertiesForType(animalType, allProperties), location);
-            case CATERPILLAR -> new com.electron3d.model.creatures.animals.herbivores.Animal(config.getAnimalPropertiesForType(animalType, allProperties), location);
+            case CATERPILLAR -> new Caterpillar(config.getAnimalPropertiesForType(animalType, allProperties), location);
             case DEER -> new Deer(config.getAnimalPropertiesForType(animalType, allProperties), location);
             case DUCK -> new Duck(config.getAnimalPropertiesForType(animalType, allProperties), location);
             case GOAT -> new Goat(config.getAnimalPropertiesForType(animalType, allProperties), location);

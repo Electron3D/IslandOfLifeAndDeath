@@ -41,7 +41,7 @@ public class IslandSimulationConfig {
     private void setupSimulationParameters(List<String> lines) {
         //todo
         maxTimeOfSimulationInSeconds = 150;
-        timeMultiplier = 1;
+        timeMultiplier = 8;
     }
 
     private void setupIslandDimensions(List<String> lines) {

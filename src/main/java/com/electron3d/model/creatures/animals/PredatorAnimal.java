@@ -14,11 +14,20 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
         super(properties, location);
     }
 
+    /**
+     * Filtering animals from all eatable on island cell,
+     * check is it still alive,
+     * filter the same type and chose somebody who the animal has chances to eat
+     * @param foodList - all eatable on island
+     * @return - filtered animal that was chosen to try to eat it
+     */
     @Override
     public Eatable findFood(List<Eatable> foodList) {
         return foodList.parallelStream()
                 .filter(x -> x instanceof Animal)
-                .filter(y -> ((Animal) y).getProperties().getType() != this.getProperties().getType())
+                .filter(y -> !((Animal) y).isDead())
+                .filter(z -> ((Animal) z).getProperties().getType() != this.getProperties().getType())
+                .filter(t -> this.getProperties().getChancesToEat(((Animal) t).getProperties().getType().getType()) != 0)
                 .findFirst()
                 .orElse(null);
     }

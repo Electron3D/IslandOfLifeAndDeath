@@ -4,6 +4,7 @@ public final class PlantProperties {
     private final String type;
     private final double weight;
     private final int boundOnTheSameField;
+    public final static String ICON = "\uD83C\uDF3F";
     public PlantProperties(String type, double weight, int boundOnTheSameField) {
         this.type = type;
         this.weight = weight;

@@ -6,8 +6,8 @@ import com.electron3d.model.creatures.*;
 import java.util.*;
 
 public class Cell {
-    private final List<Animal> animalsOnTheCell = new ArrayList<>();
-    private final List<Plant> plantsOnTheCell = new ArrayList<>();
+    private final List<Animal> animalsOnCell = new ArrayList<>();
+    private final List<Plant> plantsOnCell = new ArrayList<>();
     private final List<Cell> possibleWays = new ArrayList<>();
     private final List<Animal> graveYard = new ArrayList<>();
     private int newBornAnimalsCounter;
@@ -20,9 +20,9 @@ public class Cell {
 
     public void growPlants() {
         PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
-        for (int i = 0; i < plantsOnTheCell.size(); i++) {
+        for (int i = 0; i < plantsOnCell.size(); i++) {
             List<Plant> newGrownPlants = new ArrayList<>();
-            Plant plant = plantsOnTheCell.get(i);
+            Plant plant = plantsOnCell.get(i);
             int numberOfNewGrownPlants = plant.grow();
             for (int j = 0; j < numberOfNewGrownPlants; j++) {
                 newGrownPlants.add(new Plant(properties, this));
@@ -34,8 +34,8 @@ public class Cell {
     public void doAnimalStuff() {
         List<Animal> diedAnimalsToday = new ArrayList<>();
         List<Animal> newBornAnimalsToday = new ArrayList<>();
-        for (int i = 0; i < animalsOnTheCell.size(); i++) {
-            Animal animal = animalsOnTheCell.get(i);
+        for (int i = 0; i < animalsOnCell.size(); i++) {
+            Animal animal = animalsOnCell.get(i);
             if (animal.isWalkedToday()) {
                 continue;
             }
@@ -46,7 +46,7 @@ public class Cell {
             if (breedSucceed) {
                 AnimalFactory factory = new AnimalFactory();
                 Animal animalToAdd = factory.createAnimal(animal.getProperties().getType(), animal.getCurrentLocation());
-                long amountOfAnimalsThisTypeOnCell = animalsOnTheCell
+                long amountOfAnimalsThisTypeOnCell = animalsOnCell
                         .stream()
                         .filter(a -> a.getProperties().getType().equals(animalToAdd.getProperties().getType()))
                         .count();
@@ -61,7 +61,7 @@ public class Cell {
     }
 
     public void decomposeTheCorpses() {
-        List<Animal> deadAnimals = animalsOnTheCell
+        List<Animal> deadAnimals = animalsOnCell
                 .stream()
                 .filter(Animal::isDead)
                 .toList();
@@ -69,7 +69,7 @@ public class Cell {
     }
 
     public void setNewDay() {
-        animalsOnTheCell.forEach(animal -> animal.setWalkedToday(false));
+        animalsOnCell.forEach(animal -> animal.setWalkedToday(false));
     }
 
     private void releaseNewBornAnimals(List<Animal> newBornAnimalsToday) {
@@ -87,31 +87,31 @@ public class Cell {
     }
 
     private void addPlants(List<Plant> newGrownPlantsToAdd) {
-        synchronized (plantsOnTheCell) {
-            plantsOnTheCell.addAll(newGrownPlantsToAdd);
+        synchronized (plantsOnCell) {
+            plantsOnCell.addAll(newGrownPlantsToAdd);
         }
     }
 
     public void addPlant(Plant plantToAdd) {
-        synchronized (plantsOnTheCell) {
-            plantsOnTheCell.add(plantToAdd);
+        synchronized (plantsOnCell) {
+            plantsOnCell.add(plantToAdd);
         }
     }
 
     public void deletePlant(Plant plantToDelete) {
-        synchronized (plantsOnTheCell) {
-            plantsOnTheCell.remove(plantToDelete);
+        synchronized (plantsOnCell) {
+            plantsOnCell.remove(plantToDelete);
         }
     }
     public void addAnimal(Animal animalToAdd) {
-        synchronized (animalsOnTheCell) {
-            animalsOnTheCell.add(animalToAdd);
+        synchronized (animalsOnCell) {
+            animalsOnCell.add(animalToAdd);
         }
     }
 
     public void deleteAnimal(Animal animalToDelete) {
-        synchronized (animalsOnTheCell) {
-            animalsOnTheCell.remove(animalToDelete);
+        synchronized (animalsOnCell) {
+            animalsOnCell.remove(animalToDelete);
         }
     }
 
@@ -122,18 +122,18 @@ public class Cell {
     }
 
     public Animal getTheOldestAnimal() {
-        return animalsOnTheCell
+        return animalsOnCell
                 .stream()
                 .max(Comparator.comparingInt(Animal::getDaysAliveCounter))
                 .orElse(null);
     }
 
-    public Set<Animal> getAnimalsOnTheCellCopy() {
-        return Set.copyOf(animalsOnTheCell);
+    public Set<Animal> getAnimalsOnCellCopy() {
+        return Set.copyOf(animalsOnCell);
     }
 
-    public List<Plant> getPlantsOnTheCellCopy() {
-        return List.copyOf(plantsOnTheCell);
+    public List<Plant> getPlantsOnCellCopy() {
+        return List.copyOf(plantsOnCell);
     }
 
     public List<Cell> getCopyOfPossibleWays() {
@@ -155,16 +155,16 @@ public class Cell {
     public int getY() {
         return y;
     }
-    public int getAmountOfPlantsOnTheCell() {
-        return plantsOnTheCell.size();
+    public int getAmountOfPlantsOnCell() {
+        return plantsOnCell.size();
     }
 
-    public int getAmountOfAnimalsOnTheCell() {
-        return animalsOnTheCell.size();
+    public int getAmountOfAnimalsOnCell() {
+        return animalsOnCell.size();
     }
 
     @Override
     public String toString() {
-        return "{" + x + "," + y + "|pl:" + getAmountOfPlantsOnTheCell() + "|an:" + getAmountOfAnimalsOnTheCell() + "}";
+        return "{" + x + "," + y + "|pl:" + getAmountOfPlantsOnCell() + "|an:" + getAmountOfAnimalsOnCell() + "}";
     }
 }

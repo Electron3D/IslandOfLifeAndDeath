@@ -94,7 +94,7 @@ public class Island {
         for (int y = 0; y < cells.length; y++) {
             for (int x = 0; x < cells[y].length; x++) {
                 Cell cell = cells[y][x];
-                if (cell.getAmountOfAnimalsOnTheCell() <= 0) {
+                if (cell.getAmountOfAnimalsOnCell() <= 0) {
                     continue;
                 }
                 cell.doAnimalStuff();
@@ -111,7 +111,7 @@ public class Island {
                 .parallel()
                 .flatMap(cellsRow -> Arrays
                         .stream(cellsRow)
-                        .map(Cell::getAmountOfAnimalsOnTheCell))
+                        .map(Cell::getAmountOfAnimalsOnCell))
                 .reduce(Integer::sum).orElse(0) > 0;
     }
 
@@ -131,19 +131,19 @@ public class Island {
                 if (cell.getY() < 10) {
                     cellsToString.append(" ");
                 }
-                if (cell.getAmountOfPlantsOnTheCell() < 10) {
+                if (cell.getAmountOfPlantsOnCell() < 10) {
                     cellsToString.append(" ");
                 }
-                if (cell.getAmountOfPlantsOnTheCell() < 100) {
+                if (cell.getAmountOfPlantsOnCell() < 100) {
                     cellsToString.append(" ");
                 }
-                if (cell.getAmountOfAnimalsOnTheCell() < 10) {
+                if (cell.getAmountOfAnimalsOnCell() < 10) {
                     cellsToString.append(" ");
                 }
-                if (cell.getAmountOfAnimalsOnTheCell() < 100) {
+                if (cell.getAmountOfAnimalsOnCell() < 100) {
                     cellsToString.append(" ");
                 }
-                if (cell.getAmountOfAnimalsOnTheCell() < 1000) {
+                if (cell.getAmountOfAnimalsOnCell() < 1000) {
                     cellsToString.append(" ");
                 }
             }

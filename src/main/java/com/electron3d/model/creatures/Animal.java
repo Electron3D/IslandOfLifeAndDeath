@@ -80,10 +80,10 @@ public abstract class Animal {
 
     private List<Eatable> getFoodListFromCell() {
         return Stream.concat(
-                currentLocation.getAnimalsOnTheCellCopy().stream()
+                currentLocation.getAnimalsOnCellCopy().stream()
                         .filter(x -> x instanceof Eatable)
                         .map(x -> (Eatable) x),
-                currentLocation.getPlantsOnTheCellCopy().stream()
+                currentLocation.getPlantsOnCellCopy().stream()
                         .map(x -> (Eatable) x)
         ).toList();
     }
@@ -103,7 +103,7 @@ public abstract class Animal {
         List<Cell> possibleWays = currentLocation.getCopyOfPossibleWays();
         Cell destinationCell = possibleWays.get(new Random().nextInt(0, possibleWays.size()));
         if (destinationCell != previousLocation) {
-            if (destinationCell.getAmountOfAnimalsOnTheCell() < getProperties().getBoundOnTheSameField()) {
+            if (destinationCell.getAmountOfAnimalsOnCell() < getProperties().getBoundOnTheSameField()) {
                 return destinationCell;
             } else {
                 return this.currentLocation;
@@ -141,7 +141,7 @@ public abstract class Animal {
     }
 
     private boolean breed() {
-        List<Animal> animalsSameType = currentLocation.getAnimalsOnTheCellCopy()
+        List<Animal> animalsSameType = currentLocation.getAnimalsOnCellCopy()
                 .stream()
                 .filter(a -> a.properties.getType().equals(this.properties.getType()))
                 .toList();

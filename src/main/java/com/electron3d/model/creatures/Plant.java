@@ -5,7 +5,6 @@ import com.electron3d.model.island.Cell;
 import java.util.Random;
 
 public class Plant implements Eatable {
-    public final static String ICON = "\uD83C\uDF3F";
     private final PlantProperties properties;
     private final Cell location;
     private double numberOfBerries;
@@ -14,13 +13,13 @@ public class Plant implements Eatable {
     public Plant(PlantProperties properties, Cell location) {
         this.properties = properties;
         this.location = location;
-        this.numberOfBerries = properties.getWeight() * 10;
+        this.numberOfBerries = properties.getWeight() * 8;
     }
 
     public int grow() {
-        if (plantGrowth >= 1) {
+        if (plantGrowth >= 2) {
             int boundOnTheSameField = properties.getBoundOnTheSameField();
-            int amount = location.getAmountOfPlantsOnTheCell();
+            int amount = location.getAmountOfPlantsOnCell();
             if (amount > 0 && amount < boundOnTheSameField) {
                 Random random = new Random();
                 int numberOfNewGrownPlants = random.nextInt(0, 10);

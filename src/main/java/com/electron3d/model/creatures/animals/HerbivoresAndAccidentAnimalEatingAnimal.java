@@ -1,10 +1,7 @@
 package com.electron3d.model.creatures.animals;
 
-import com.electron3d.model.creatures.AnimalProperties;
-import com.electron3d.model.creatures.AnimalType;
-import com.electron3d.model.creatures.Eatable;
-import com.electron3d.model.creatures.Plant;
-import com.electron3d.model.creatures.animals.herbivores.Animal;
+import com.electron3d.model.creatures.*;
+import com.electron3d.model.creatures.animals.herbivores.Caterpillar;
 import com.electron3d.model.island.Cell;
 
 import java.util.List;
@@ -22,10 +19,20 @@ public abstract class HerbivoresAndAccidentAnimalEatingAnimal extends Herbivores
                 .findFirst()
                 .orElse(findAnimal(foodList));
     }
+
+    /**
+     * Filtering animals from all eatable on island cell,
+     * check is it still alive,
+     * filter the same type and chose somebody who the animal has chances to eat
+     * @param foodList - all eatable on island
+     * @return - filtered animal that was chosen to try to eat it
+     */
     public Eatable findAnimal(List<Eatable> foodList) {
         return foodList.parallelStream()
                 .filter(x -> x instanceof Animal)
                 .filter(y -> !((Animal) y).isDead())
+                .filter(z -> ((Animal) z).getProperties().getType() != this.getProperties().getType())
+                .filter(t -> this.getProperties().getChancesToEat(((Animal) t).getProperties().getType().getType()) != 0)
                 .findFirst()
                 .orElse(null);
     }
@@ -48,7 +55,7 @@ public abstract class HerbivoresAndAccidentAnimalEatingAnimal extends Herbivores
     }
 
     @Override
-    public double hunt(com.electron3d.model.creatures.Animal food) {
+    public double hunt(Animal food) {
         Random chanceToEat = new Random();
         Eatable exactFood = (Eatable) food;
         AnimalType foodType = food.getProperties().getType();

@@ -4,13 +4,14 @@ import com.electron3d.model.IslandSimulation;
 import com.electron3d.model.config.IslandSimulationConfig;
 import com.electron3d.model.creatures.Animal;
 import com.electron3d.model.creatures.AnimalType;
-import com.electron3d.model.creatures.Plant;
 import com.electron3d.model.island.Cell;
 import com.electron3d.model.island.Island;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.electron3d.model.creatures.PlantProperties.ICON;
 
 public class Renderer {
     private final Island island;
@@ -31,6 +32,7 @@ public class Renderer {
     }
 
     public void printSimulationStateForDay(int timer) {
+        System.out.println("\n\n\n");
         printCurrentDay(timer);
         getSnapshotOfTheIsland();
         printStats();
@@ -59,11 +61,10 @@ public class Renderer {
         int totalNumberOfAnimals = 0;
         int totalNumberOfDeadAnimals = 0;
         int totalNumberOfNewBornAnimals = 0;
-        for (int y = 0; y < cells.length; y++) {
-            for (int x = 0; x < cells[y].length; x++) {
-                Cell cell = cells[y][x];
-                totalNumberOfAnimals = totalNumberOfAnimals + cell.getAmountOfAnimalsOnTheCell();
-                totalNumberOfPlants = totalNumberOfPlants + cell.getAmountOfPlantsOnTheCell();
+        for (Cell[] value : cells) {
+            for (Cell cell : value) {
+                totalNumberOfAnimals = totalNumberOfAnimals + cell.getAmountOfAnimalsOnCell();
+                totalNumberOfPlants = totalNumberOfPlants + cell.getAmountOfPlantsOnCell();
                 totalNumberOfDeadAnimals = totalNumberOfDeadAnimals + cell.getGraveYardSize();
                 totalNumberOfNewBornAnimals = totalNumberOfNewBornAnimals + cell.getNewBornAnimalsCounter();
             }
@@ -72,7 +73,7 @@ public class Renderer {
         if (theOldestAnimal == null) {
             System.out.println("All are dead!");
         }
-        System.out.println("Plants total: " + totalNumberOfPlants + " " + Plant.ICON);
+        System.out.println("Plants total: " + totalNumberOfPlants + " " + ICON);
         System.out.print("Animals total: " + totalNumberOfAnimals + " ");
         printCountOfEachTypeOfAnimal();
         System.out.println();
@@ -83,15 +84,13 @@ public class Renderer {
             System.out.println("The oldest animal is: " + theOldestAnimal.getProperties().getType().getIcon() + theOldestAnimalName
                     + ". Lives already " + theOldestAnimal.getDaysAliveCounter() + " days.");
         }
-        System.out.println("\n\n\n");
     }
 
     private void printCountOfEachTypeOfAnimal() {
         List<Animal> allAnimals = new ArrayList<>();
-        for (int y = 0; y < cells.length; y++) {
-            for (int x = 0; x < cells[y].length; x++) {
-                Cell cell = cells[y][x];
-                allAnimals.addAll(cell.getAnimalsOnTheCellCopy());
+        for (Cell[] value : cells) {
+            for (Cell cell : value) {
+                allAnimals.addAll(cell.getAnimalsOnCellCopy());
             }
         }
         for (AnimalType type : AnimalType.values()) {
@@ -109,7 +108,7 @@ public class Renderer {
     private Animal getTheOldestAnimal() {
         Cell startedCell = Arrays.stream(cells)
                 .flatMap(array -> Arrays.stream(array)
-                        .filter(cell -> cell.getAmountOfAnimalsOnTheCell() > 0))
+                        .filter(cell -> cell.getAmountOfAnimalsOnCell() > 0))
                 .findFirst()
                 .orElse(null);
         if (startedCell == null) {

@@ -5,8 +5,8 @@ import com.electron3d.model.creatures.Eatable;
 import com.electron3d.model.creatures.animals.HerbivoresAnimal;
 import com.electron3d.model.island.Cell;
 
-public class Animal extends HerbivoresAnimal implements Eatable {
-    public Animal(AnimalProperties properties, Cell location) {
+public class Caterpillar extends HerbivoresAnimal implements Eatable {
+    public Caterpillar(AnimalProperties properties, Cell location) {
         super(properties, location);
     }
 
