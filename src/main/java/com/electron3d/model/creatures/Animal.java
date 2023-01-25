@@ -20,7 +20,7 @@ public abstract class Animal {
     private Cell currentLocation;
     public Animal(AnimalProperties properties, Cell currentLocation) {
         this.properties = properties;
-        this.fullEnoughLevel = properties.getAmountOfFoodToBeFull() / 3;
+        this.fullEnoughLevel = properties.getAmountOfFoodToBeFull();
         this.startedHealthPoints = (int) ((properties.getWeight() - properties.getAmountOfFoodToBeFull()) * 1000);
         this.currentHealthPoints = startedHealthPoints;
         this.currentLocation = currentLocation;

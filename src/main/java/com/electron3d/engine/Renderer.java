@@ -30,6 +30,12 @@ public class Renderer {
         System.out.println("Time flow speed multiplier set to x" + timeFlowSpeedMultiplier + "\n");
     }
 
+    public void printSimulationStateForDay(int timer) {
+        printCurrentDay(timer);
+        getSnapshotOfTheIsland();
+        printStats();
+    }
+
     public void printCurrentDay(int timer) {
         IslandSimulationConfig islandSimulationConfig = IslandSimulationConfig.getInstance();
         int timeFlowSpeedMultiplier = islandSimulationConfig.getTimeMultiplier();

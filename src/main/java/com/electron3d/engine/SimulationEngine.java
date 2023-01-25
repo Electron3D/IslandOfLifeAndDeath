@@ -21,7 +21,7 @@ public class SimulationEngine {
 
         while (timer != maxTimeOfSimulationInSeconds) {
             timer++;
-            renderer.printCurrentDay(timer);
+            renderer.printSimulationStateForDay(timer);
             boolean isSimulationEnded = simulation.simulate();
             if (isSimulationEnded) {
                 break;

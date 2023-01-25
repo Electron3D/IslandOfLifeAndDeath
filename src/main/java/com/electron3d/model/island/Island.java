@@ -79,6 +79,14 @@ public class Island {
         return possibleWays;
     }
 
+    public void growPlants() {
+        for (int y = 0; y < cells.length; y++) {
+            for (int x = 0; x < cells[y].length; x++) {
+                Cell cell = cells[y][x];
+                cell.growPlants();
+            }
+        }
+    }
     public boolean live() {
         if (!checkIsSmbAlive()) {
             return true;
@@ -89,7 +97,6 @@ public class Island {
                 if (cell.getAmountOfAnimalsOnTheCell() <= 0) {
                     continue;
                 }
-                cell.growPlants();
                 cell.doAnimalStuff();
                 cell.decomposeTheCorpses();
                 cell.setNewDay();

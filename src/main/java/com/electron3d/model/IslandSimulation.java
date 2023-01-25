@@ -1,6 +1,5 @@
 package com.electron3d.model;
 
-import com.electron3d.engine.Renderer;
 import com.electron3d.model.config.IslandSimulationConfig;
 import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.island.Island;
@@ -26,11 +25,8 @@ public class IslandSimulation {
     }
 
     public boolean simulate() {
-        boolean isIslandDead = island.live();
-        Renderer renderer = new Renderer(this);
-        renderer.getSnapshotOfTheIsland();
-        renderer.printStats();
-        return isIslandDead;
+        island.growPlants();
+        return island.live();
     }
 
     public Island getIsland() {
