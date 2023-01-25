@@ -64,6 +64,7 @@ public abstract class Animal {
         int numberOfStepsLeft = properties.getRange();
         boolean success;
         while (true) {
+            //сильно тормозит программу
             Eatable food = findFood(getFoodListFromCell());
             if (food != null) {
                 success = eat(food);
@@ -78,19 +79,11 @@ public abstract class Animal {
         return false;
     }
 
-    private List<Eatable> getFoodListFromCell() {
-        return Stream.concat(
-                currentLocation.getAnimalsOnCellCopy().stream()
-                        .filter(x -> x instanceof Eatable)
-                        .map(x -> (Eatable) x),
-                currentLocation.getPlantsOnCellCopy().stream()
-                        .map(x -> (Eatable) x)
-        ).toList();
-    }
+    protected abstract List<Eatable> getFoodListFromCell();
 
-    public abstract boolean eat(Eatable food);
+    protected abstract boolean eat(Eatable food);
 
-    public abstract Eatable findFood(List<Eatable> foodList);
+    protected abstract Eatable findFood(List<Eatable> foodList);
 
     public void walk(Cell destinationCell) {
         this.currentLocation.deleteAnimal(this);

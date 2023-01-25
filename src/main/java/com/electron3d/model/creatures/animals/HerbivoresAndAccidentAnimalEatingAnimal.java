@@ -1,11 +1,11 @@
 package com.electron3d.model.creatures.animals;
 
 import com.electron3d.model.creatures.*;
-import com.electron3d.model.creatures.animals.herbivores.Caterpillar;
 import com.electron3d.model.island.Cell;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public abstract class HerbivoresAndAccidentAnimalEatingAnimal extends HerbivoresAnimal implements Predatory {
     public HerbivoresAndAccidentAnimalEatingAnimal(AnimalProperties properties, Cell location) {
@@ -13,8 +13,21 @@ public abstract class HerbivoresAndAccidentAnimalEatingAnimal extends Herbivores
     }
 
     @Override
+    protected List<Eatable> getFoodListFromCell() {
+            return Stream.concat(
+                this.getCurrentLocation().getAnimalsOnCellCopy()
+                        .stream()
+                        .filter(x -> x instanceof Eatable)
+                        .map(x -> (Eatable) x),
+                this.getCurrentLocation().getPlantsOnCellCopy()
+                        .stream()
+                        .map(x -> (Eatable) x)
+        ).toList();
+    }
+
+    @Override
     public Eatable findFood(List<Eatable> foodList) {
-        return foodList.parallelStream()
+        return foodList.stream()
                 .filter(x -> x instanceof Plant)
                 .findFirst()
                 .orElse(findAnimal(foodList));
@@ -28,7 +41,7 @@ public abstract class HerbivoresAndAccidentAnimalEatingAnimal extends Herbivores
      * @return - filtered animal that was chosen to try to eat it
      */
     public Eatable findAnimal(List<Eatable> foodList) {
-        return foodList.parallelStream()
+        return foodList.stream()
                 .filter(x -> x instanceof Animal)
                 .filter(y -> !((Animal) y).isDead())
                 .filter(z -> ((Animal) z).getProperties().getType() != this.getProperties().getType())

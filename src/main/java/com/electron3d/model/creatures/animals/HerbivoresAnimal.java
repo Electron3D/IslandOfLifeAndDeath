@@ -12,8 +12,16 @@ public abstract class HerbivoresAnimal extends Animal implements Herbivores {
     }
 
     @Override
+    protected List<Eatable> getFoodListFromCell() {
+        return this.getCurrentLocation().getPlantsOnCellCopy()
+                .stream()
+                .map(x -> (Eatable) x)
+                .toList();
+    }
+
+    @Override
     public Eatable findFood(List<Eatable> foodList) {
-        return foodList.parallelStream()
+        return foodList.stream()
                 .filter(x -> x instanceof Plant)
                 .findFirst()
                 .orElse(null);

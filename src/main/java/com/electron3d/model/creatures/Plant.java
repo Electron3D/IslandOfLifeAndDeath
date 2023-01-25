@@ -13,7 +13,7 @@ public class Plant implements Eatable {
     public Plant(PlantProperties properties, Cell location) {
         this.properties = properties;
         this.location = location;
-        this.numberOfBerries = properties.getWeight() * 8;
+        this.numberOfBerries = properties.getWeight() * 12;
     }
 
     public int grow() {

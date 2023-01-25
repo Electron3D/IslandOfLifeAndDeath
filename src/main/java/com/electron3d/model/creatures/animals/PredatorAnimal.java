@@ -14,6 +14,14 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
         super(properties, location);
     }
 
+    @Override
+    protected List<Eatable> getFoodListFromCell() {
+        return this.getCurrentLocation().getAnimalsOnCellCopy()
+                .stream()
+                .filter(x -> x instanceof Eatable)
+                .map(x -> (Eatable) x).toList();
+    }
+
     /**
      * Filtering animals from all eatable on island cell,
      * check is it still alive,
@@ -23,7 +31,7 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
      */
     @Override
     public Eatable findFood(List<Eatable> foodList) {
-        return foodList.parallelStream()
+        return foodList.stream()
                 .filter(x -> x instanceof Animal)
                 .filter(y -> !((Animal) y).isDead())
                 .filter(z -> ((Animal) z).getProperties().getType() != this.getProperties().getType())
