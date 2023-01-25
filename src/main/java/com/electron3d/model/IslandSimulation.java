@@ -32,6 +32,10 @@ public class IslandSimulation {
         System.out.println("\n \n \n");
     }
 
+    public Island getIsland() {
+        return island;
+    }
+
     public void printSimulationResults() {
         System.out.println(island);
         island.printStats();

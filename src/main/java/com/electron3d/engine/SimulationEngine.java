@@ -15,9 +15,10 @@ public class SimulationEngine {
     }
 
     public void start() {
+        Renderer renderer = new Renderer(simulation);
         simulation.init();
         System.out.println("Starting condition:");
-        simulation.printSimulationResults();
+        renderer.printStartSimulationConditions();
         System.out.println();
         System.out.println();
         System.out.println();
@@ -31,6 +32,7 @@ public class SimulationEngine {
                 throw new RuntimeException(e);
             }
         }
+
         System.out.println("Time is over! Final results:");
         simulation.printSimulationResults();
     }

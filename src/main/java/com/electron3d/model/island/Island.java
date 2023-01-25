@@ -8,9 +8,10 @@ import java.util.*;
 public class Island {
     private final int xDimension;
     private final int yDimension;
-    private final Cell[][] cells;
-    private final List<AnimalType> animalTypes;
 
+    private final Cell[][] cells;
+
+    private final List<AnimalType> animalTypes;
     public Island(int xDimension, int yDimension, List<AnimalType> animalTypes) {
         this.xDimension = xDimension;
         this.yDimension = yDimension;
@@ -93,57 +94,8 @@ public class Island {
         }
     }
 
-    public void printStats() {
-        int totalNumberOfPlants = 0;
-        int totalNumberOfAnimals = 0;
-        int totalNumberOfDeadAnimals = 0;
-        int totalNumberOfNewBornAnimals = 0;
-        Animal theOldestAnimal = getTheOldestAnimal();
-        if (theOldestAnimal == null) {
-            System.out.println("All are dead!");
-            return;
-        }
-        String theOldestAnimalName = theOldestAnimal.toString().substring(theOldestAnimal.toString().indexOf(theOldestAnimal.getClass().getSimpleName()));
-        for (int y = 0; y < cells.length; y++) {
-            for (int x = 0; x < cells[y].length; x++) {
-                Cell cell = cells[y][x];
-                totalNumberOfAnimals = totalNumberOfAnimals + cell.getAmountOfAnimalsOnTheCell();
-                totalNumberOfPlants = totalNumberOfPlants + cell.getAmountOfPlantsOnTheCell();
-                totalNumberOfDeadAnimals = totalNumberOfDeadAnimals + cell.getGraveYardSize();
-                totalNumberOfNewBornAnimals = totalNumberOfNewBornAnimals + cell.getNewBornAnimalsCounter();
-            }
-        }
-        System.out.println("Plants total: " + totalNumberOfPlants);
-        System.out.println("Animals total: " + totalNumberOfAnimals);
-        System.out.println("Animals died: " + totalNumberOfDeadAnimals);
-        System.out.println("Were born " + totalNumberOfNewBornAnimals + " animals in total.");
-        System.out.println("The oldest animal is: " + theOldestAnimalName + " lives already " + theOldestAnimal.getDaysAliveCounter() + " days.");
-    }
-
-    private Animal getTheOldestAnimal() {
-        Cell startedCell = Arrays.stream(cells)
-                .flatMap(array -> Arrays.stream(array)
-                        .filter(cell -> cell.getAmountOfAnimalsOnTheCell() > 0))
-                .findFirst()
-                .orElse(null);
-        if (startedCell == null) {
-            return null;
-        }
-        Animal animal = startedCell.getTheOldestAnimal();
-        int daysAlive = animal.getDaysAliveCounter();
-        for (int y = 0; y < cells.length; y++) {
-            for (int x = 1; x < cells[y].length; x++) {
-                Cell cell = cells[y][x];
-                Animal animalToCompare = cell.getTheOldestAnimal();
-                if (animalToCompare == null) {
-                    return animal;
-                }
-                if (daysAlive < animalToCompare.getDaysAliveCounter()) {
-                    animal = animalToCompare;
-                }
-            }
-        }
-        return animal;
+    public Cell[][] getCells() {
+        return cells;
     }
 
     @Override
