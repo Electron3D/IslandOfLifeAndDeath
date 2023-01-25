@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-public abstract class HerbivoresAndAccidentAnimalEatingAnimal extends HerbivoresAnimal implements Predatory {
-    public HerbivoresAndAccidentAnimalEatingAnimal(AnimalProperties properties, Cell location) {
+public abstract class OmnivorousAnimal extends HerbivoresAnimal implements Predatory {
+    public OmnivorousAnimal(AnimalProperties properties, Cell location) {
         super(properties, location);
     }
 
