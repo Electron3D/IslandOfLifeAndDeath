@@ -3,7 +3,6 @@ package com.electron3d.model.creatures;
 import com.electron3d.model.island.Cell;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public abstract class Animal {
     private final AnimalProperties properties;
