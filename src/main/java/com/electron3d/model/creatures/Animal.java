@@ -24,6 +24,7 @@ public abstract class Animal {
         this.currentHealthPoints = startedHealthPoints;
         this.currentLocation = currentLocation;
     }
+
     /**
      *  Checking animal's state, launch fatigue effect and daily routine methods
      */

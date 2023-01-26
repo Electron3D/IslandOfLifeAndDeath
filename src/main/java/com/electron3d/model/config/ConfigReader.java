@@ -23,8 +23,8 @@ public class ConfigReader {
     }
 
     //todo
-    public static List<String> readLinesFromJSON(String configFileName) {
-        List<String> lines = new ArrayList<>();
-        return lines;
+    public static IslandSimulationConfig readConfigFromJSON(String configFileName) {
+        IslandSimulationConfig config = null;
+        return config;
     }
 }

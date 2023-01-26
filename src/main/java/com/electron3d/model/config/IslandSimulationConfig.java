@@ -4,7 +4,7 @@ import java.util.List;
 
 public class IslandSimulationConfig {
     private static IslandSimulationConfig INSTANCE;
-    private static final String SIMULATION_SPEC_FILE_NAME = "simulationCfg.csv";
+    private static final String SIMULATION_SPEC_FILE_NAME = "simulationCfg.json";
     private int timeMultiplier;
     private int maxTimeOfSimulationInSeconds;
     private final IslandDimensions islandDimensions = new IslandDimensions();

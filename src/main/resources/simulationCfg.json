@@ -1,0 +1,8 @@
+{
+  "IslandDimensions": {
+    "xDimension": 10,
+    "yDimension": 10
+  },
+  "maxTimeOfSimulationInSeconds": 150,
+  "timeMultiplier": 8
+}
