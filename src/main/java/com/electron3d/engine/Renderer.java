@@ -50,8 +50,12 @@ public class Renderer {
 
     public void printSimulationResults(int timer) {
         System.out.println("\n\n\n");
-        System.out.println("Time is over! Final results:\n");
-        System.out.println("The simulation ended on day " + timer);
+        if (timer >= IslandSimulationConfig.getInstance().getMaxTimeOfSimulationInSeconds()) {
+            System.out.print("Time is over! Final results:\n");
+        } else {
+            System.out.print("All animals extinct! Final results:\n");
+        }
+        System.out.println("The simulation ended on day " + timer + "\n");
         getSnapshotOfTheIsland();
         System.out.println();
         printStats();

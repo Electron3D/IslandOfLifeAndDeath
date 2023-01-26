@@ -22,7 +22,6 @@ public abstract class HerbivoresAnimal extends Animal implements Herbivores {
     @Override
     public Eatable findFood(List<Eatable> foodList) {
         return foodList.stream()
-                .filter(x -> x instanceof Plant)
                 .findFirst()
                 .orElse(null);
     }
