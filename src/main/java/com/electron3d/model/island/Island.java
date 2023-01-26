@@ -8,10 +8,9 @@ import java.util.*;
 public class Island {
     private final int xDimension;
     private final int yDimension;
-
     private final Cell[][] cells;
-
     private final List<AnimalType> animalTypes;
+
     public Island(int xDimension, int yDimension, List<AnimalType> animalTypes) {
         this.xDimension = xDimension;
         this.yDimension = yDimension;
@@ -87,6 +86,7 @@ public class Island {
             }
         }
     }
+
     public boolean live() {
         if (!checkIsSmbAlive()) {
             return true;
@@ -97,7 +97,7 @@ public class Island {
                 if (cell.getAmountOfAnimalsOnCell() <= 0) {
                     continue;
                 }
-                cell.doAnimalStuff();
+                cell.doAnimalStuffParallel();
                 cell.decomposeTheCorpses();
                 cell.setNewDay();
             }

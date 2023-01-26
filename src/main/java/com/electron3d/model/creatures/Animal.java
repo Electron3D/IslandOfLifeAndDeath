@@ -3,8 +3,9 @@ package com.electron3d.model.creatures;
 import com.electron3d.model.island.Cell;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 
-public abstract class Animal {
+public abstract class Animal implements Callable<Boolean> {
     private final AnimalProperties properties;
     protected final double fullEnoughLevel;
     protected final int startedHealthPoints;
@@ -15,14 +16,19 @@ public abstract class Animal {
     private boolean isDead;
     private boolean walkedToday;
     private Cell previousLocation;
-
     private Cell currentLocation;
+
     public Animal(AnimalProperties properties, Cell currentLocation) {
         this.properties = properties;
         this.fullEnoughLevel = properties.getAmountOfFoodToBeFull();
         this.startedHealthPoints = (int) ((properties.getWeight() - properties.getAmountOfFoodToBeFull()) * 1000);
         this.currentHealthPoints = startedHealthPoints;
         this.currentLocation = currentLocation;
+    }
+
+    @Override
+    public Boolean call() {
+        return liveADay();
     }
 
     /**

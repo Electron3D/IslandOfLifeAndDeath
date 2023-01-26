@@ -4,6 +4,7 @@ import com.electron3d.model.config.AnimalsConfig;
 import com.electron3d.model.creatures.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 public class Cell {
     private final List<Animal> animalsOnCell = new ArrayList<>();
@@ -56,6 +57,41 @@ public class Cell {
                 }
             }
         }
+        buryAnimals(diedAnimalsToday);
+        releaseNewBornAnimals(newBornAnimalsToday);
+    }
+
+    public void doAnimalStuffParallel() {
+        List<Animal> diedAnimalsToday = new ArrayList<>();
+        List<Animal> newBornAnimalsToday = new ArrayList<>();
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (int i = 0; i < animalsOnCell.size(); i++) {
+            try {
+                Animal animal = animalsOnCell.get(i);
+                if (animal.isWalkedToday()) {
+                    continue;
+                }
+                boolean breedSucceed = executorService.submit(animal).get();
+                if (animal.isDead()) {
+                    diedAnimalsToday.add(animal);
+                }
+                if (breedSucceed) {
+                    AnimalFactory factory = new AnimalFactory();
+                    Animal animalToAdd = factory.createAnimal(animal.getProperties().getType(), animal.getCurrentLocation());
+                    long amountOfAnimalsThisTypeOnCell = animalsOnCell
+                            .stream()
+                            .filter(a -> a.getProperties().getType().equals(animalToAdd.getProperties().getType()))
+                            .count();
+                    int boundOfThisTypeAnimalOnCell = animalToAdd.getProperties().getBoundOnTheSameField();
+                    if (amountOfAnimalsThisTypeOnCell + newBornAnimalsToday.size() + 1 < boundOfThisTypeAnimalOnCell) {
+                        newBornAnimalsToday.add(animalToAdd);
+                    }
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        executorService.shutdown();
         buryAnimals(diedAnimalsToday);
         releaseNewBornAnimals(newBornAnimalsToday);
     }
