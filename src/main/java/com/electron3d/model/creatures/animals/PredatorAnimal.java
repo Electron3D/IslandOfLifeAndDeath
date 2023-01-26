@@ -1,7 +1,7 @@
 package com.electron3d.model.creatures.animals;
 
 import com.electron3d.model.creatures.Animal;
-import com.electron3d.model.creatures.AnimalProperties;
+import com.electron3d.model.creatures.AnimalSpecification;
 import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.creatures.Eatable;
 import com.electron3d.model.island.Cell;
@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class PredatorAnimal extends Animal implements Predatory {
-    public PredatorAnimal(AnimalProperties properties, Cell location) {
+    public PredatorAnimal(AnimalSpecification properties, Cell location) {
         super(properties, location);
     }
 
     @Override
     protected List<Eatable> getFoodListFromCell() {
         return this.getCurrentLocation()
-                .getAnimalsOnCellCopy()
+                .getAnimalsOnCell()
                 .stream()
                 .map(x -> (Eatable) x)
                 .toList();
@@ -33,10 +33,10 @@ public abstract class PredatorAnimal extends Animal implements Predatory {
     @Override
     public Eatable findFood(List<Eatable> foodList) {
         return foodList.stream()
-                .filter(x -> x instanceof Animal)
-                .filter(y -> !((Animal) y).isDead())
-                .filter(z -> ((Animal) z).getProperties().getType() != this.getProperties().getType())
-                .filter(t -> this.getProperties().getChancesToEat(((Animal) t).getProperties().getType().getType()) != 0)
+                .filter(x -> x instanceof Animal
+                        && !((Animal) x).isDead()
+                        && ((Animal) x).getProperties().getType() != this.getProperties().getType()
+                        && this.getProperties().getChancesToEat(((Animal) x).getProperties().getType().getType()) != 0)
                 .findFirst()
                 .orElse(null);
     }

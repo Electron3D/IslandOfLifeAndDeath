@@ -37,7 +37,10 @@ public class EatingChancesConfig {
             String line = lines.get(i);
             List<String> values = List.of(line.split(","));
             String typeName = values.get(0);
-            AnimalType type = Arrays.stream(AnimalType.values()).filter(x -> typeName.equals(x.getType())).findFirst().get();
+            AnimalType type = Arrays.stream(AnimalType.values())
+                    .filter(x -> typeName.equals(x.getType()))
+                    .findFirst()
+                    .orElseThrow();
             Map<String, Double> eatChances = new HashMap<>();
             for (int j = 1; j < values.size(); j++) {
                 String foodName = foodNames.get(j);

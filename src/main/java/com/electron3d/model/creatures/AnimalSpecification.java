@@ -2,7 +2,7 @@ package com.electron3d.model.creatures;
 
 import java.util.Map;
 
-public final class AnimalProperties {
+public final class AnimalSpecification {
     private final AnimalType type;
     private final double weight;
     private final int range;
@@ -10,7 +10,9 @@ public final class AnimalProperties {
     private final double amountOfFoodToBeFull;
     private final Map<String, Double> chancesToEat;
 
-    public AnimalProperties(AnimalType type, double weight, int range, int boundOnTheSameField, double amountOfFoodToBeFull, Map<String, Double> chancesToEat) {
+    public AnimalSpecification(AnimalType type, double weight, int range,
+                               int boundOnTheSameField, double amountOfFoodToBeFull,
+                               Map<String, Double> chancesToEat) {
         this.type = type;
         this.weight = weight;
         this.range = range;

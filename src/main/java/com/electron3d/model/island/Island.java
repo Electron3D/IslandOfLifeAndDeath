@@ -37,11 +37,11 @@ public class Island {
 
     private void initPlants(Cell cell) {
         Random startingPlantsCountChooser = new Random();
-        PlantProperties properties = AnimalsConfig.getInstance().getPlantProperties();
+        PlantSpecification properties = AnimalsConfig.getInstance().getPlantSpecification();
         int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(properties.getBoundOnTheSameField() + 1);
         for (int i = 0; i < amountOfPlantsOnTheField; i++) {
             Plant newPlant = new Plant(properties, cell);
-            newPlant.setPlantGrowth(3);
+            newPlant.setPlantToGrowthStage();
             cell.addPlant(newPlant);
         }
     }
@@ -49,11 +49,10 @@ public class Island {
     private void initAnimals(Cell cell) {
         Random startingAnimalsCountChooser = new Random();
         AnimalsConfig config = AnimalsConfig.getInstance();
-        List<AnimalProperties> animalsProperties = config.getAnimalsProperties();
         AnimalFactory factory = new AnimalFactory();
         for (AnimalType animalType : animalTypes) {
-            AnimalProperties animalProperties = config.getAnimalPropertiesForType(animalType, animalsProperties);
-            int startingAnimalsCount = startingAnimalsCountChooser.nextInt(animalProperties.getBoundOnTheSameField() + 1);
+            AnimalSpecification animalSpecification = config.getAnimalSpecificationForType(animalType);
+            int startingAnimalsCount = startingAnimalsCountChooser.nextInt(animalSpecification.getBoundOnTheSameField() + 1);
             for (int i = 0; i < startingAnimalsCount; i++) {
                 Animal animal = factory.createAnimal(animalType, cell);
                 animal.setAdult(true);
@@ -78,25 +77,14 @@ public class Island {
         return possibleWays;
     }
 
-    public void growPlants() {
-        for (int y = 0; y < cells.length; y++) {
-            for (int x = 0; x < cells[y].length; x++) {
-                Cell cell = cells[y][x];
-                cell.growPlants();
-            }
-        }
-    }
-
-    public boolean live() {
+    public boolean liveADay() {
         if (!checkIsSmbAlive()) {
             return true;
         }
         for (int y = 0; y < cells.length; y++) {
             for (int x = 0; x < cells[y].length; x++) {
                 Cell cell = cells[y][x];
-                if (cell.getAmountOfAnimalsOnCell() <= 0) {
-                    continue;
-                }
+                cell.growPlants();
                 cell.doAnimalStuffParallel();
                 cell.decomposeTheCorpses();
                 cell.setNewDay();
@@ -112,7 +100,8 @@ public class Island {
                 .flatMap(cellsRow -> Arrays
                         .stream(cellsRow)
                         .map(Cell::getAmountOfAnimalsOnCell))
-                .reduce(Integer::sum).orElse(0) > 0;
+                .reduce(Integer::sum)
+                .orElse(0) > 0;
     }
 
     public Cell[][] getCells() {

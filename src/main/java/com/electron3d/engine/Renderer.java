@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.electron3d.model.creatures.PlantProperties.ICON;
+import static com.electron3d.model.creatures.PlantSpecification.ICON;
 
 public class Renderer {
     private final Island island;
@@ -24,11 +24,11 @@ public class Renderer {
 
     public void printStartSimulationConditions() {
         IslandSimulationConfig islandSimulationConfig = IslandSimulationConfig.getInstance();
-        int timeFlowSpeedMultiplier = islandSimulationConfig.getTimeMultiplier();
+        double delayMultiplier = islandSimulationConfig.getTimeDelayMultiplier();
         int maxTimer = islandSimulationConfig.getMaxTimeOfSimulationInSeconds();
         System.out.println("Starting condition:");
         System.out.println("Simulation will continue to " + maxTimer + " day.");
-        System.out.println("Time flow speed multiplier set to x" + timeFlowSpeedMultiplier + "\n");
+        System.out.println("Time delay multiplier is set to x" + delayMultiplier);
     }
 
     public void printSimulationStateForDay(int timer) {
@@ -40,8 +40,8 @@ public class Renderer {
 
     public void printCurrentDay(int timer) {
         IslandSimulationConfig islandSimulationConfig = IslandSimulationConfig.getInstance();
-        int timeFlowSpeedMultiplier = islandSimulationConfig.getTimeMultiplier();
-        System.out.println("Day: " + timer + " speed x" + timeFlowSpeedMultiplier);
+        double timeFlowSpeedMultiplier = islandSimulationConfig.getTimeDelayMultiplier();
+        System.out.println("Day: " + timer + " Delay - " + timeFlowSpeedMultiplier);
     }
 
     public void getSnapshotOfTheIsland() {
@@ -95,7 +95,7 @@ public class Renderer {
         List<Animal> allAnimals = new ArrayList<>();
         for (Cell[] value : cells) {
             for (Cell cell : value) {
-                allAnimals.addAll(cell.getAnimalsOnCellCopy());
+                allAnimals.addAll(cell.getAnimalsOnCell());
             }
         }
         for (AnimalType type : AnimalType.values()) {

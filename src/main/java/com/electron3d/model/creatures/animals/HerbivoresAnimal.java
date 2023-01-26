@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class HerbivoresAnimal extends Animal implements Herbivores {
-    public HerbivoresAnimal(AnimalProperties properties, Cell location) {
+    public HerbivoresAnimal(AnimalSpecification properties, Cell location) {
         super(properties, location);
     }
 
     @Override
     protected List<Eatable> getFoodListFromCell() {
-        return this.getCurrentLocation().getPlantsOnCellCopy()
+        return this.getCurrentLocation().getPlantsOnCell()
                 .stream()
                 .map(x -> (Eatable) x)
                 .toList();

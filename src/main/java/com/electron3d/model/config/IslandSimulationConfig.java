@@ -3,7 +3,7 @@ package com.electron3d.model.config;
 public class IslandSimulationConfig {
     private static IslandSimulationConfig INSTANCE;
     private static final String SIMULATION_SPEC_FILE_NAME = "simulationCfg.json";
-    private int timeMultiplier;
+    private double timeDelayMultiplier;
     private int maxTimeOfSimulationInSeconds;
     private int xDimension;
     private int yDimension;
@@ -18,16 +18,16 @@ public class IslandSimulationConfig {
     private IslandSimulationConfig() {
     }
 
-    public int getTimeMultiplier() {
-        return timeMultiplier;
+    public double getTimeDelayMultiplier() {
+        return timeDelayMultiplier;
     }
 
     public int getMaxTimeOfSimulationInSeconds() {
         return maxTimeOfSimulationInSeconds;
     }
 
-    public void setTimeMultiplier(int timeMultiplier) {
-        this.timeMultiplier = timeMultiplier;
+    public void setTimeDelayMultiplier(String timeDelayMultiplier) {
+        this.timeDelayMultiplier = Double.parseDouble(timeDelayMultiplier);
     }
 
     public void setMaxTimeOfSimulationInSeconds(int maxTimeOfSimulationInSeconds) {

@@ -5,8 +5,11 @@ import com.electron3d.model.island.Cell;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public abstract class Animal implements Callable<Boolean> {
-    private final AnimalProperties properties;
+public abstract class Animal implements Callable<Animal> {
+    private static final int AGE_OF_BECOMING_ADULT = 10;
+    private static final int MAX_NUMBER_OF_DAYS_WITHOUT_FOOD = 4;
+    private static final int STARVATION_MULTIPLIER = 4;
+    private final AnimalSpecification properties;
     protected final double fullEnoughLevel;
     protected final int startedHealthPoints;
     protected int currentHealthPoints;
@@ -15,10 +18,11 @@ public abstract class Animal implements Callable<Boolean> {
     private boolean isAdult;
     private boolean isDead;
     private boolean walkedToday;
+    private boolean bredSuccessfullyToday;
     private Cell previousLocation;
-    private Cell currentLocation;
 
-    public Animal(AnimalProperties properties, Cell currentLocation) {
+    private Cell currentLocation;
+    public Animal(AnimalSpecification properties, Cell currentLocation) {
         this.properties = properties;
         this.fullEnoughLevel = properties.getAmountOfFoodToBeFull();
         this.startedHealthPoints = (int) ((properties.getWeight() - properties.getAmountOfFoodToBeFull()) * 1000);
@@ -27,17 +31,23 @@ public abstract class Animal implements Callable<Boolean> {
     }
 
     @Override
-    public Boolean call() {
-        return liveADay();
+    public Animal call() {
+        tryToBreed();
+        return this;
     }
 
     /**
-     *  Checking animal's state, launch fatigue effect and daily routine methods
+     *  Checking animal's state, launch fatigue effect
+     *  and methods that needs to satisfy animal's needs
+     *  for success breeding
      */
-    public boolean liveADay() {
+    public void tryToBreed() {
+        if (walkedToday) {
+            return;
+        }
         walkedToday = true;
         if (isDead) {
-            return false;
+            return;
         }
         boolean success = roamInSearchOfFood();
         feelHunger();
@@ -47,12 +57,10 @@ public abstract class Animal implements Callable<Boolean> {
         if (success && !isDead) {
             growUp();
             if (isAdult) {
-                return breed();
-            } else {
-                return false;
+                bredSuccessfullyToday = breed();
             }
         } else {
-            if (starvation >= 7) {
+            if (starvation >= MAX_NUMBER_OF_DAYS_WITHOUT_FOOD) {
                 isDead = die();
             } else {
                 starvation++;
@@ -60,7 +68,6 @@ public abstract class Animal implements Callable<Boolean> {
             if (!isDead) {
                 growUp();
             }
-            return false;
         }
     }
 
@@ -71,7 +78,6 @@ public abstract class Animal implements Callable<Boolean> {
         int numberOfStepsLeft = properties.getRange();
         boolean success;
         while (true) {
-            //сильно тормозит программу
             Eatable food = findFood(getFoodListFromCell());
             if (food != null) {
                 success = eat(food);
@@ -100,7 +106,7 @@ public abstract class Animal implements Callable<Boolean> {
     }
 
     private Cell chooseDirection() {
-        List<Cell> possibleWays = currentLocation.getCopyOfPossibleWays();
+        List<Cell> possibleWays = currentLocation.getPossibleWays();
         Cell destinationCell = possibleWays.get(new Random().nextInt(0, possibleWays.size()));
         if (destinationCell != previousLocation) {
             if (destinationCell.getAmountOfAnimalsOnCell() < getProperties().getBoundOnTheSameField()) {
@@ -114,7 +120,7 @@ public abstract class Animal implements Callable<Boolean> {
     }
 
     private void feelHunger() {
-        currentHealthPoints = currentHealthPoints - starvation * 2;
+        currentHealthPoints = currentHealthPoints - starvation * STARVATION_MULTIPLIER;
     }
 
     /**
@@ -141,7 +147,7 @@ public abstract class Animal implements Callable<Boolean> {
     }
 
     private boolean breed() {
-        List<Animal> animalsSameType = currentLocation.getAnimalsOnCellCopy()
+        List<Animal> animalsSameType = currentLocation.getAnimalsOnCell()
                 .stream()
                 .filter(a -> a.properties.getType().equals(this.properties.getType()))
                 .toList();
@@ -155,14 +161,14 @@ public abstract class Animal implements Callable<Boolean> {
             return false;
         }
     }
+
     private void growUp() {
         daysAliveCounter++;
-        if (daysAliveCounter > 7) {
+        if (daysAliveCounter > AGE_OF_BECOMING_ADULT) {
             isAdult = true;
         }
     }
-
-    public AnimalProperties getProperties() {
+    public AnimalSpecification getProperties() {
         return properties;
     }
 
@@ -186,11 +192,15 @@ public abstract class Animal implements Callable<Boolean> {
         isDead = dead;
     }
 
-    public boolean isWalkedToday() {
-        return walkedToday;
+    public void setWalkedTodayFalse() {
+        this.walkedToday = false;
     }
 
-    public void setWalkedToday(boolean walkedToday) {
-        this.walkedToday = walkedToday;
+    public boolean isBredSuccessfullyToday() {
+        return bredSuccessfullyToday;
+    }
+
+    public void setBredSuccessfullyTodayFalse() {
+        this.bredSuccessfullyToday = false;
     }
 }

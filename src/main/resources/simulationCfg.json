@@ -1,5 +1,5 @@
 {
-  "timeMultiplier":8,
+  "timeDelayMultiplier":"0.5",
   "maxTimeOfSimulationInSeconds":150,
   "xDimension":10,
   "yDimension":10

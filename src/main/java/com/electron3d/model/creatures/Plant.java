@@ -5,19 +5,20 @@ import com.electron3d.model.island.Cell;
 import java.util.Random;
 
 public class Plant implements Eatable {
-    private final PlantProperties properties;
+    private final static int LEVEL_TO_START_GROWING = 2;
+    private final PlantSpecification properties;
     private final Cell location;
     private double numberOfBerries;
-    private int plantGrowth;
+    private int level;
 
-    public Plant(PlantProperties properties, Cell location) {
+    public Plant(PlantSpecification properties, Cell location) {
         this.properties = properties;
         this.location = location;
-        this.numberOfBerries = properties.getWeight() * 12;
+        this.numberOfBerries = properties.getWeight() * 10;
     }
 
     public int grow() {
-        if (plantGrowth >= 2) {
+        if (level >= LEVEL_TO_START_GROWING) {
             int boundOnTheSameField = properties.getBoundOnTheSameField();
             int amount = location.getAmountOfPlantsOnCell();
             if (amount > 0 && amount < boundOnTheSameField) {
@@ -33,7 +34,7 @@ public class Plant implements Eatable {
                 return 0;
             }
         } else {
-            plantGrowth++;
+            level++;
             return 0;
         }
     }
@@ -51,11 +52,11 @@ public class Plant implements Eatable {
         return location;
     }
 
-    public PlantProperties getProperties() {
+    public PlantSpecification getProperties() {
         return properties;
     }
 
-    public void setPlantGrowth(int plantGrowth) {
-        this.plantGrowth = plantGrowth;
+    public void setPlantToGrowthStage() {
+        this.level = LEVEL_TO_START_GROWING;
     }
 }

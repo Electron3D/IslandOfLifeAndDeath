@@ -8,17 +8,17 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 public abstract class OmnivorousAnimal extends HerbivoresAnimal implements Predatory {
-    public OmnivorousAnimal(AnimalProperties properties, Cell location) {
+    public OmnivorousAnimal(AnimalSpecification properties, Cell location) {
         super(properties, location);
     }
 
     @Override
     protected List<Eatable> getFoodListFromCell() {
             return Stream.concat(
-                this.getCurrentLocation().getAnimalsOnCellCopy()
+                this.getCurrentLocation().getAnimalsOnCell()
                         .stream()
                         .map(x -> (Eatable) x),
-                this.getCurrentLocation().getPlantsOnCellCopy()
+                this.getCurrentLocation().getPlantsOnCell()
                         .stream()
                         .map(x -> (Eatable) x)
         ).toList();
@@ -41,10 +41,10 @@ public abstract class OmnivorousAnimal extends HerbivoresAnimal implements Preda
      */
     public Eatable findAnimal(List<Eatable> foodList) {
         return foodList.stream()
-                .filter(x -> x instanceof Animal)
-                .filter(y -> !((Animal) y).isDead())
-                .filter(z -> ((Animal) z).getProperties().getType() != this.getProperties().getType())
-                .filter(t -> this.getProperties().getChancesToEat(((Animal) t).getProperties().getType().getType()) != 0)
+                .filter(x -> x instanceof Animal
+                        && !((Animal) x).isDead()
+                        && ((Animal) x).getProperties().getType() != this.getProperties().getType()
+                        && this.getProperties().getChancesToEat(((Animal) x).getProperties().getType().getType()) != 0)
                 .findFirst()
                 .orElse(null);
     }
