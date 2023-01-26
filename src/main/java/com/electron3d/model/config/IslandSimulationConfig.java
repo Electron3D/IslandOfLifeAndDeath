@@ -3,9 +3,10 @@ package com.electron3d.model.config;
 public class IslandSimulationConfig {
     private static IslandSimulationConfig INSTANCE;
     private static final String SIMULATION_SPEC_FILE_NAME = "simulationCfg.json";
-    private final int timeMultiplier;
-    private final int maxTimeOfSimulationInSeconds;
-    private final IslandDimensions islandDimensions;
+    private int timeMultiplier;
+    private int maxTimeOfSimulationInSeconds;
+    private int xDimension;
+    private int yDimension;
 
     public static IslandSimulationConfig getInstance() {
         if (INSTANCE == null) {
@@ -14,10 +15,7 @@ public class IslandSimulationConfig {
         return INSTANCE;
     }
 
-    private IslandSimulationConfig(int timeMultiplier, int maxTimeOfSimulationInSeconds, IslandDimensions islandDimensions) {
-        this.timeMultiplier = timeMultiplier;
-        this.maxTimeOfSimulationInSeconds = maxTimeOfSimulationInSeconds;
-        this.islandDimensions = islandDimensions;
+    private IslandSimulationConfig() {
     }
 
     public int getTimeMultiplier() {
@@ -28,23 +26,27 @@ public class IslandSimulationConfig {
         return maxTimeOfSimulationInSeconds;
     }
 
-    public IslandDimensions getIslandDimensions() {
-        return islandDimensions;
+    public void setTimeMultiplier(int timeMultiplier) {
+        this.timeMultiplier = timeMultiplier;
     }
 
-    public static class IslandDimensions {
-        int xDimension;
-        int yDimension;
+    public void setMaxTimeOfSimulationInSeconds(int maxTimeOfSimulationInSeconds) {
+        this.maxTimeOfSimulationInSeconds = maxTimeOfSimulationInSeconds;
+    }
 
-        public IslandDimensions() {
-        }
+    public int getxDimension() {
+        return xDimension;
+    }
 
-        public int getXDimension() {
-            return xDimension;
-        }
+    public int getyDimension() {
+        return yDimension;
+    }
 
-        public int getYDimension() {
-            return yDimension;
-        }
+    public void setxDimension(int xDimension) {
+        this.xDimension = xDimension;
+    }
+
+    public void setyDimension(int yDimension) {
+        this.yDimension = yDimension;
     }
 }

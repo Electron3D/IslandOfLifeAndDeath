@@ -15,8 +15,8 @@ public class IslandSimulation {
         System.out.println("Configuration loaded");
         System.out.println("Creating an island...");
         island = new Island(
-                islandSimulationConfig.getIslandDimensions().getXDimension(),
-                islandSimulationConfig.getIslandDimensions().getYDimension(),
+                islandSimulationConfig.getxDimension(),
+                islandSimulationConfig.getyDimension(),
                 Arrays.stream(AnimalType.values()).toList());
         System.out.println("The island created");
         System.out.println("Initialization...");
