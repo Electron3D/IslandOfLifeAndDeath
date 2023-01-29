@@ -85,13 +85,13 @@ public class Renderer {
         System.out.println("Were born " + totalNumberOfNewBornAnimals + " animals in total \uD83D\uDC76\uD83C\uDFFB");
         if (theOldestAnimal != null) {
             String theOldestAnimalName = theOldestAnimal.toString().substring(theOldestAnimal.toString().indexOf(theOldestAnimal.getClass().getSimpleName()));
-            System.out.println("The oldest animal is: " + theOldestAnimal.getProperties().getType().getIcon() + theOldestAnimalName
+            System.out.println("The oldest animal is: " + theOldestAnimal.getSpecification().getType().getIcon() + theOldestAnimalName
                     + ". Lives already " + theOldestAnimal.getDaysAliveCounter() + " days in cell " + theOldestAnimal.getCurrentLocation());
             Set<AnimalType> animalTypesOnTheSameCell = theOldestAnimal
                     .getCurrentLocation()
                     .getAnimalsOnCell()
                     .stream()
-                    .map(animal -> animal.getProperties().getType())
+                    .map(animal -> animal.getSpecification().getType())
                     .collect(Collectors.toSet());
             System.out.println("The oldest animal share the cell with: " + animalTypesOnTheSameCell);
         }
@@ -107,7 +107,7 @@ public class Renderer {
         for (AnimalType type : AnimalType.values()) {
             int counter = 0;
             for (Animal animal : allAnimals) {
-                AnimalType animalType = animal.getProperties().getType();
+                AnimalType animalType = animal.getSpecification().getType();
                 if (type.equals(animalType)) {
                     counter++;
                 }

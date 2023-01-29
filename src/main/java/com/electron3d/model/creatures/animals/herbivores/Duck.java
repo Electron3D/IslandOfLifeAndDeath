@@ -12,6 +12,6 @@ public class Duck extends OmnivorousAnimal implements Eatable  {
 
     @Override
     public double restoreHP() {
-        return getProperties().getWeight();
+        return getSpecification().getWeight();
     }
 }

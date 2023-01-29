@@ -13,6 +13,6 @@ public class Python  extends PredatorAnimal implements Eatable {
 
     @Override
     public double restoreHP() {
-        return getProperties().getWeight();
+        return getSpecification().getWeight();
     }
 }

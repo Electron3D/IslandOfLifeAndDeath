@@ -42,8 +42,8 @@ public class Cell {
         }
         for (Animal animal : animalsOnCell) {
             if (animal.isBredSuccessfullyToday()) {
-                AnimalType type = animal.getProperties().getType();
-                int boundOfThisTypeAnimalOnCell = animal.getProperties().getBoundOnTheSameField();
+                AnimalType type = animal.getSpecification().getType();
+                int boundOfThisTypeAnimalOnCell = animal.getSpecification().getBoundOnTheSameField();
                 long amountOfAnimalsThisTypeOnCell = animalsOnCellByType.get(type).size();
                 if (amountOfAnimalsThisTypeOnCell + 1 < boundOfThisTypeAnimalOnCell) {
                     AnimalFactory factory = new AnimalFactory();
@@ -88,12 +88,12 @@ public class Cell {
     }
 
     public void addAnimal(Animal animalToAdd) {
-        AnimalType type = animalToAdd.getProperties().getType();
+        AnimalType type = animalToAdd.getSpecification().getType();
         animalsOnCellByType.putIfAbsent(type, new CopyOnWriteArrayList<>());
         animalsOnCellByType.get(type).add(animalToAdd);
     }
     public void deleteAnimal(Animal animalToDelete) {
-        AnimalType type = animalToDelete.getProperties().getType();
+        AnimalType type = animalToDelete.getSpecification().getType();
         animalsOnCellByType.get(type).remove(animalToDelete);
     }
 
@@ -103,6 +103,10 @@ public class Cell {
 
     public List<Animal> getAnimalsOnCell() {
         return animalsOnCellByType.values().stream().flatMap(Collection::stream).toList();
+    }
+
+    public List<Animal> getAmountOfAnimalsOnCellForType(AnimalType type) {
+        return animalsOnCellByType.get(type);
     }
 
     public List<Plant> getPlantsOnCell() {
