@@ -7,9 +7,8 @@ import com.electron3d.model.creatures.AnimalType;
 import com.electron3d.model.island.Cell;
 import com.electron3d.model.island.Island;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.electron3d.model.creatures.PlantSpecification.ICON;
 
@@ -41,7 +40,7 @@ public class Renderer {
     public void printCurrentDay(int timer) {
         IslandSimulationConfig islandSimulationConfig = IslandSimulationConfig.getInstance();
         double timeFlowSpeedMultiplier = islandSimulationConfig.getTimeDelayMultiplier();
-        System.out.println("Day: " + timer + " Delay - " + timeFlowSpeedMultiplier);
+        System.out.println("Day: " + timer + " Delay - " + timeFlowSpeedMultiplier + " sec");
     }
 
     public void getSnapshotOfTheIsland() {
@@ -87,7 +86,14 @@ public class Renderer {
         if (theOldestAnimal != null) {
             String theOldestAnimalName = theOldestAnimal.toString().substring(theOldestAnimal.toString().indexOf(theOldestAnimal.getClass().getSimpleName()));
             System.out.println("The oldest animal is: " + theOldestAnimal.getProperties().getType().getIcon() + theOldestAnimalName
-                    + ". Lives already " + theOldestAnimal.getDaysAliveCounter() + " days.");
+                    + ". Lives already " + theOldestAnimal.getDaysAliveCounter() + " days in cell " + theOldestAnimal.getCurrentLocation());
+            Set<AnimalType> animalTypesOnTheSameCell = theOldestAnimal
+                    .getCurrentLocation()
+                    .getAnimalsOnCell()
+                    .stream()
+                    .map(animal -> animal.getProperties().getType())
+                    .collect(Collectors.toSet());
+            System.out.println("The oldest animal share the cell with: " + animalTypesOnTheSameCell);
         }
     }
 
@@ -111,28 +117,11 @@ public class Renderer {
     }
 
     private Animal getTheOldestAnimal() {
-        Cell startedCell = Arrays.stream(cells)
-                .flatMap(array -> Arrays.stream(array)
-                        .filter(cell -> cell.getAmountOfAnimalsOnCell() > 0))
-                .findFirst()
+        return Arrays.stream(cells)
+                .flatMap(Arrays::stream)
+                .flatMap(cell -> cell.getAnimalsOnCell().stream())
+                .parallel()
+                .max(Comparator.comparingInt(Animal::getDaysAliveCounter))
                 .orElse(null);
-        if (startedCell == null) {
-            return null;
-        }
-        Animal animal = startedCell.getTheOldestAnimal();
-        int daysAlive = animal.getDaysAliveCounter();
-        for (int y = 0; y < cells.length; y++) {
-            for (int x = 1; x < cells[y].length; x++) {
-                Cell cell = cells[y][x];
-                Animal animalToCompare = cell.getTheOldestAnimal();
-                if (animalToCompare == null) {
-                    return animal;
-                }
-                if (daysAlive < animalToCompare.getDaysAliveCounter()) {
-                    animal = animalToCompare;
-                }
-            }
-        }
-        return animal;
     }
 }

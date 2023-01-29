@@ -38,7 +38,8 @@ public class Island {
     private void initPlants(Cell cell) {
         Random startingPlantsCountChooser = new Random();
         PlantSpecification properties = AnimalsConfig.getInstance().getPlantSpecification();
-        int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(properties.getBoundOnTheSameField() + 1);
+        int boundOnTheSameCell = properties.getBoundOnTheSameCell();
+        int amountOfPlantsOnTheField = startingPlantsCountChooser.nextInt(boundOnTheSameCell / 3, boundOnTheSameCell + 1);
         for (int i = 0; i < amountOfPlantsOnTheField; i++) {
             Plant newPlant = new Plant(properties, cell);
             newPlant.setPlantToGrowthStage();

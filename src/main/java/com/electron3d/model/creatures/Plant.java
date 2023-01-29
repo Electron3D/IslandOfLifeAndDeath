@@ -14,12 +14,12 @@ public class Plant implements Eatable {
     public Plant(PlantSpecification properties, Cell location) {
         this.properties = properties;
         this.location = location;
-        this.numberOfBerries = properties.getWeight() * 10;
+        this.numberOfBerries = properties.getWeight() * 15;
     }
 
     public int grow() {
         if (level >= LEVEL_TO_START_GROWING) {
-            int boundOnTheSameField = properties.getBoundOnTheSameField();
+            int boundOnTheSameField = properties.getBoundOnTheSameCell();
             int amount = location.getAmountOfPlantsOnCell();
             if (amount > 0 && amount < boundOnTheSameField) {
                 Random random = new Random();
