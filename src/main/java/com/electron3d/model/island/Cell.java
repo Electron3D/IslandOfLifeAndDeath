@@ -41,7 +41,7 @@ public class Cell {
             throw new RuntimeException(e);
         }
         for (Animal animal : animalsOnCell) {
-            if (animal.isBredSuccessfullyToday()) {
+            if (animal.isBredSuccessfullyToday() && !animal.isDead()) {
                 AnimalType type = animal.getSpecification().getType();
                 int boundOfThisTypeAnimalOnCell = animal.getSpecification().getBoundOnTheSameField();
                 long amountOfAnimalsThisTypeOnCell = animalsOnCellByType.get(type).size();

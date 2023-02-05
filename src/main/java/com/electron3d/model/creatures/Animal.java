@@ -32,7 +32,9 @@ public abstract class Animal implements Callable<Animal> {
 
     @Override
     public Animal call() {
-        tryToBreed();
+        if (!walkedToday && !isDead) {
+            tryToCompleteDailyGoals();
+        }
         return this;
     }
 
@@ -41,19 +43,14 @@ public abstract class Animal implements Callable<Animal> {
      *  and methods that needs to satisfy animal's needs
      *  for success breeding
      */
-    public void tryToBreed() {
-        if (walkedToday) {
-            return;
-        }
-        walkedToday = true;
-        if (isDead) {
-            return;
-        }
+    public void tryToCompleteDailyGoals() {
+        //todo on some day animal can grow up more than one time, need to fix it
         boolean success = roamInSearchOfFood();
         feelHunger();
         if (currentHealthPoints <= 0) {
             isDead = die();
         }
+        walkedToday = true;
         if (success && !isDead) {
             growUp();
             if (isAdult) {
@@ -98,13 +95,6 @@ public abstract class Animal implements Callable<Animal> {
 
     protected abstract Eatable findFood(List<Eatable> foodList);
 
-    public void walk(Cell destinationCell) {
-        this.currentLocation.deleteAnimal(this);
-        previousLocation = currentLocation;
-        currentLocation = destinationCell;
-        this.currentLocation.addAnimal(this);
-    }
-
     private Cell chooseDirection() {
         List<Cell> possibleWays = currentLocation.getPossibleWays();
         Cell destinationCell = possibleWays.get(new Random().nextInt(0, possibleWays.size()));
@@ -118,6 +108,13 @@ public abstract class Animal implements Callable<Animal> {
         } else {
             return chooseDirection();
         }
+    }
+
+    public void walk(Cell destinationCell) {
+        this.currentLocation.deleteAnimal(this);
+        previousLocation = currentLocation;
+        currentLocation = destinationCell;
+        this.currentLocation.addAnimal(this);
     }
 
     private void feelHunger() {

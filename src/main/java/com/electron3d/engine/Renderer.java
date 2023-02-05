@@ -17,8 +17,8 @@ public class Renderer {
     private final Cell[][] cells;
 
     public Renderer(IslandSimulation simulation) {
-        island = simulation.getIsland();
-        cells = island.getCells();
+        this.island = simulation.getIsland();
+        this.cells = island.getCells();
     }
 
     public void printStartSimulationConditions() {

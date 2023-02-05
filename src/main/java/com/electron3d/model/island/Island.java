@@ -27,9 +27,8 @@ public class Island {
                 initAnimals(cell);
             }
         }
-        for (int y = 0; y < cells.length; y++) {
-            for (int x = 0; x < cells[y].length; x++) {
-                Cell cell = cells[y][x];
+        for (Cell[] cellsRow : cells) {
+            for (Cell cell : cellsRow) {
                 cell.addPossibleWays(initPossibleWays(cell));
             }
         }
@@ -64,14 +63,14 @@ public class Island {
 
     private List<Cell> initPossibleWays(Cell cell) {
         List<Cell> possibleWays = new ArrayList<>();
-        int i0 = cell.getX();
-        int j0 = cell.getY();
+        int y0 = cell.getY();
+        int x0 = cell.getX();
         int height = cells.length;
         int width = cells[0].length;
-        for (int i = i0 - 1; i <= i0 + 1; ++i) {
-            for (int j = j0 - 1; j <= j0 + 1; ++j) {
-                if (0 <= i && i < height && 0 <= j && j < width && (i != i0 || j != j0)) {
-                    possibleWays.add(cells[j][i]);
+        for (int y = y0 - 1; y <= y0 + 1; ++y) {
+            for (int x = x0 - 1; x <= x0 + 1; ++x) {
+                if (0 <= y && y < height && 0 <= x && x < width && (y != y0 || x != x0)) {
+                    possibleWays.add(cells[y][x]);
                 }
             }
         }
@@ -82,9 +81,8 @@ public class Island {
         if (!checkIsSmbAlive()) {
             return true;
         }
-        for (int y = 0; y < cells.length; y++) {
-            for (int x = 0; x < cells[y].length; x++) {
-                Cell cell = cells[y][x];
+        for (Cell[] cellsRow : cells) {
+            for (Cell cell : cellsRow) {
                 cell.growPlants();
                 cell.doAnimalStuffParallel();
                 cell.decomposeTheCorpses();

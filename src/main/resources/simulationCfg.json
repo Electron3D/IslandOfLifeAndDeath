@@ -1,6 +1,6 @@
 {
   "timeDelayMultiplier":"0.1",
-  "maxTimeOfSimulationInSeconds":150,
-  "xDimension":10,
-  "yDimension":10
+  "maxTimeOfSimulationInSeconds":15000,
+  "xDimension":6,
+  "yDimension":12
 }
