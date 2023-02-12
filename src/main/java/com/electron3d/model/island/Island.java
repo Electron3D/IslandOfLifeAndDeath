@@ -85,6 +85,10 @@ public class Island {
             for (Cell cell : cellsRow) {
                 cell.growPlants();
                 cell.doAnimalStuffParallel();
+            }
+        }
+        for (Cell[] cellsRow : cells) {
+            for (Cell cell : cellsRow) {
                 cell.decomposeTheCorpses();
                 cell.setNewDay();
             }

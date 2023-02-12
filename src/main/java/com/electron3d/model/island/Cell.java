@@ -40,6 +40,17 @@ public class Cell {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        executorService.shutdown();
+        boolean isTerminated;
+        try {
+            isTerminated = executorService.awaitTermination(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if (!isTerminated) {
+            throw new RuntimeException("Timeout ends, executor still isn't terminated.");
+        }
+        //todo animals can live forever for some reason without starving and growing up
         for (Animal animal : animalsOnCell) {
             if (animal.isBredSuccessfullyToday() && !animal.isDead()) {
                 AnimalType type = animal.getSpecification().getType();
@@ -52,7 +63,6 @@ public class Cell {
                 }
             }
         }
-        executorService.shutdown();
     }
 
     public void decomposeTheCorpses() {

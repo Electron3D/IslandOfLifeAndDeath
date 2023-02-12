@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 public abstract class Animal implements Callable<Animal> {
     private static final int AGE_OF_BECOMING_ADULT = 10;
     private static final int MAX_NUMBER_OF_DAYS_WITHOUT_FOOD = 4;
-    private static final int STARVATION_MULTIPLIER = 4;
+    private static final int STARVATION_MULTIPLIER = 5;
     private final AnimalSpecification specification;
     protected final double fullEnoughLevel;
     protected final int startedHealthPoints;
@@ -16,11 +16,10 @@ public abstract class Animal implements Callable<Animal> {
     private int starvation;
     private int daysAliveCounter;
     private boolean isAdult;
-    private boolean isDead;
+    private volatile boolean isDead;
     private boolean walkedToday;
     private boolean bredSuccessfullyToday;
     private Cell previousLocation;
-
     private Cell currentLocation;
     public Animal(AnimalSpecification specification, Cell currentLocation) {
         this.specification = specification;
@@ -44,7 +43,6 @@ public abstract class Animal implements Callable<Animal> {
      *  for success breeding
      */
     public void tryToCompleteDailyGoals() {
-        //todo on some day animal can grow up more than one time, need to fix it
         boolean success = roamInSearchOfFood();
         feelHunger();
         if (currentHealthPoints <= 0) {
