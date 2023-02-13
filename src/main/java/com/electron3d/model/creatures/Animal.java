@@ -2,7 +2,9 @@ package com.electron3d.model.creatures;
 
 import com.electron3d.model.island.Cell;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Callable;
 
 public abstract class Animal implements Callable<Animal> {
@@ -42,7 +44,7 @@ public abstract class Animal implements Callable<Animal> {
      *  and methods that needs to satisfy animal's needs
      *  for success breeding
      */
-    public void tryToCompleteDailyGoals() {
+    private void tryToCompleteDailyGoals() {
         boolean success = roamInSearchOfFood();
         feelHunger();
         if (currentHealthPoints <= 0) {
