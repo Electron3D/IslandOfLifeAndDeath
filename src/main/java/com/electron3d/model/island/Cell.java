@@ -50,7 +50,6 @@ public class Cell {
         if (!isTerminated) {
             throw new RuntimeException("Timeout ends, executor still isn't terminated.");
         }
-        //todo animals can live forever for some reason without starving and growing up
         for (Animal animal : animalsOnCell) {
             if (animal.isBredSuccessfullyToday() && !animal.isDead()) {
                 AnimalType type = animal.getSpecification().getType();

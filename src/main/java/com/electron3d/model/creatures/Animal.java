@@ -98,6 +98,9 @@ public abstract class Animal implements Callable<Animal> {
         Cell destinationCell = possibleWays.get(new Random().nextInt(0, possibleWays.size()));
         if (destinationCell != previousLocation) {
             List<Animal> sameTypeAnimals = destinationCell.getAmountOfAnimalsOnCellForType(specification.getType());
+            if (sameTypeAnimals == null) {
+                sameTypeAnimals = new ArrayList<>(0);
+            }
             if (sameTypeAnimals.size() < specification.getBoundOnTheSameField()) {
                 return destinationCell;
             } else {
@@ -108,7 +111,7 @@ public abstract class Animal implements Callable<Animal> {
         }
     }
 
-    public void walk(Cell destinationCell) {
+    private void walk(Cell destinationCell) {
         this.currentLocation.deleteAnimal(this);
         previousLocation = currentLocation;
         currentLocation = destinationCell;
