@@ -12,6 +12,6 @@ public class Rabbit extends HerbivoresAnimal implements Eatable {
 
     @Override
     public double restoreHP() {
-        return getProperties().getWeight();
+        return getSpecification().getWeight();
     }
 }

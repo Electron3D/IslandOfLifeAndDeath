@@ -19,7 +19,7 @@ public final class PlantSpecification {
         return weight;
     }
 
-    public int getBoundOnTheSameField() {
+    public int getBoundOnTheSameCell() {
         return boundOnTheSameField;
     }
 }

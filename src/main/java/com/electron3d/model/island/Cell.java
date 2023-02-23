@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class Cell {
-    private final List<Animal> animalsOnCell = new CopyOnWriteArrayList<>();
+    private final Map<AnimalType, List<Animal>> animalsOnCellByType = new HashMap<>();
     private final List<Plant> plantsOnCell = new CopyOnWriteArrayList<>();
     private final List<Cell> possibleWays = new CopyOnWriteArrayList<>();
     private final List<Animal> graveYard = new ArrayList<>();
@@ -34,53 +34,58 @@ public class Cell {
 
     public void doAnimalStuffParallel() {
         ExecutorService executorService = Executors.newCachedThreadPool();
+        List<Animal> animalsOnCell = getAnimalsOnCell();
         try {
             executorService.invokeAll(animalsOnCell);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        executorService.shutdown();
+        boolean isTerminated;
+        try {
+            isTerminated = executorService.awaitTermination(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if (!isTerminated) {
+            throw new RuntimeException("Timeout ends, executor still isn't terminated.");
+        }
         for (Animal animal : animalsOnCell) {
-            if (animal.isDead()) {
-                buryAnimal(animal);
-            }
-            if (animal.isBredSuccessfullyToday()) {
-                AnimalFactory factory = new AnimalFactory();
-                Animal animalToAdd = factory.createAnimal(animal.getProperties().getType(), animal.getCurrentLocation());
-                long amountOfAnimalsThisTypeOnCell = animalsOnCell
-                        .stream()
-                        .filter(a -> a.getProperties().getType().equals(animalToAdd.getProperties().getType()))
-                        .count();
-                int boundOfThisTypeAnimalOnCell = animalToAdd.getProperties().getBoundOnTheSameField();
+            if (animal.isBredSuccessfullyToday() && !animal.isDead()) {
+                AnimalType type = animal.getSpecification().getType();
+                int boundOfThisTypeAnimalOnCell = animal.getSpecification().getBoundOnTheSameField();
+                long amountOfAnimalsThisTypeOnCell = animalsOnCellByType.get(type).size();
                 if (amountOfAnimalsThisTypeOnCell + 1 < boundOfThisTypeAnimalOnCell) {
+                    AnimalFactory factory = new AnimalFactory();
+                    Animal animalToAdd = factory.createAnimal(type, animal.getCurrentLocation());
                     releaseNewBornAnimal(animalToAdd);
                 }
             }
         }
-        executorService.shutdown();
     }
 
     public void decomposeTheCorpses() {
-        animalsOnCell
+        animalsOnCellByType.values().forEach(animalsOnCell -> animalsOnCell
                 .stream()
                 .filter(Animal::isDead)
-                .forEach(animalsOnCell::remove);
+                .forEach(this::buryAnimal));
     }
 
     public void setNewDay() {
-        animalsOnCell.forEach(animal -> {
+        getAnimalsOnCell().forEach(animal -> {
             animal.setWalkedTodayFalse();
             animal.setBredSuccessfullyTodayFalse();
         });
     }
 
     private void releaseNewBornAnimal(Animal newBornAnimalToday) {
-        animalsOnCell.add(newBornAnimalToday);
+        addAnimal(newBornAnimalToday);
         newBornAnimalsCounter++;
     }
 
     public void buryAnimal(Animal deadAnimal) {
         graveYard.add(deadAnimal);
-        animalsOnCell.remove(deadAnimal);
+        deleteAnimal(deadAnimal);
     }
 
     public void addPlant(Plant plantToAdd) {
@@ -92,26 +97,25 @@ public class Cell {
     }
 
     public void addAnimal(Animal animalToAdd) {
-        animalsOnCell.add(animalToAdd);
+        AnimalType type = animalToAdd.getSpecification().getType();
+        animalsOnCellByType.putIfAbsent(type, new CopyOnWriteArrayList<>());
+        animalsOnCellByType.get(type).add(animalToAdd);
     }
-
     public void deleteAnimal(Animal animalToDelete) {
-        animalsOnCell.remove(animalToDelete);
+        AnimalType type = animalToDelete.getSpecification().getType();
+        animalsOnCellByType.get(type).remove(animalToDelete);
     }
 
     public void addPossibleWays(List<Cell> possibleWaysToAdd) {
         possibleWays.addAll(possibleWaysToAdd);
     }
 
-    public Animal getTheOldestAnimal() {
-        return animalsOnCell
-                .parallelStream()
-                .max(Comparator.comparingInt(Animal::getDaysAliveCounter))
-                .orElse(null);
+    public List<Animal> getAnimalsOnCell() {
+        return animalsOnCellByType.values().stream().flatMap(Collection::stream).toList();
     }
 
-    public List<Animal> getAnimalsOnCell() {
-        return animalsOnCell;
+    public List<Animal> getAmountOfAnimalsOnCellForType(AnimalType type) {
+        return animalsOnCellByType.get(type);
     }
 
     public List<Plant> getPlantsOnCell() {
@@ -143,7 +147,7 @@ public class Cell {
     }
 
     public int getAmountOfAnimalsOnCell() {
-        return animalsOnCell.size();
+        return animalsOnCellByType.values().stream().mapToInt(List::size).sum();
     }
 
     @Override

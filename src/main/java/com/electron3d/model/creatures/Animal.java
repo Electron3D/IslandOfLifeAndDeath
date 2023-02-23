@@ -2,37 +2,40 @@ package com.electron3d.model.creatures;
 
 import com.electron3d.model.island.Cell;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Callable;
 
 public abstract class Animal implements Callable<Animal> {
     private static final int AGE_OF_BECOMING_ADULT = 10;
     private static final int MAX_NUMBER_OF_DAYS_WITHOUT_FOOD = 4;
-    private static final int STARVATION_MULTIPLIER = 4;
-    private final AnimalSpecification properties;
+    private static final int STARVATION_MULTIPLIER = 5;
+    private final AnimalSpecification specification;
     protected final double fullEnoughLevel;
     protected final int startedHealthPoints;
     protected int currentHealthPoints;
     private int starvation;
     private int daysAliveCounter;
     private boolean isAdult;
-    private boolean isDead;
+    private volatile boolean isDead;
     private boolean walkedToday;
     private boolean bredSuccessfullyToday;
     private Cell previousLocation;
-
     private Cell currentLocation;
-    public Animal(AnimalSpecification properties, Cell currentLocation) {
-        this.properties = properties;
-        this.fullEnoughLevel = properties.getAmountOfFoodToBeFull();
-        this.startedHealthPoints = (int) ((properties.getWeight() - properties.getAmountOfFoodToBeFull()) * 1000);
+    public Animal(AnimalSpecification specification, Cell currentLocation) {
+        this.specification = specification;
+        this.fullEnoughLevel = specification.getAmountOfFoodToBeFull();
+        this.startedHealthPoints = (int) ((specification.getWeight() - specification.getAmountOfFoodToBeFull()) * 1000);
         this.currentHealthPoints = startedHealthPoints;
         this.currentLocation = currentLocation;
     }
 
     @Override
     public Animal call() {
-        tryToBreed();
+        if (!walkedToday && !isDead) {
+            tryToCompleteDailyGoals();
+        }
         return this;
     }
 
@@ -41,19 +44,13 @@ public abstract class Animal implements Callable<Animal> {
      *  and methods that needs to satisfy animal's needs
      *  for success breeding
      */
-    public void tryToBreed() {
-        if (walkedToday) {
-            return;
-        }
-        walkedToday = true;
-        if (isDead) {
-            return;
-        }
+    private void tryToCompleteDailyGoals() {
         boolean success = roamInSearchOfFood();
         feelHunger();
         if (currentHealthPoints <= 0) {
             isDead = die();
         }
+        walkedToday = true;
         if (success && !isDead) {
             growUp();
             if (isAdult) {
@@ -75,7 +72,7 @@ public abstract class Animal implements Callable<Animal> {
      * An animal keep roaming from cell to cell until it finds food or the number of steps left ends.
      */
     private boolean roamInSearchOfFood() {
-        int numberOfStepsLeft = properties.getRange();
+        int numberOfStepsLeft = specification.getRange();
         boolean success;
         while (true) {
             Eatable food = findFood(getFoodListFromCell());
@@ -98,18 +95,15 @@ public abstract class Animal implements Callable<Animal> {
 
     protected abstract Eatable findFood(List<Eatable> foodList);
 
-    public void walk(Cell destinationCell) {
-        this.currentLocation.deleteAnimal(this);
-        previousLocation = currentLocation;
-        currentLocation = destinationCell;
-        this.currentLocation.addAnimal(this);
-    }
-
     private Cell chooseDirection() {
         List<Cell> possibleWays = currentLocation.getPossibleWays();
         Cell destinationCell = possibleWays.get(new Random().nextInt(0, possibleWays.size()));
         if (destinationCell != previousLocation) {
-            if (destinationCell.getAmountOfAnimalsOnCell() < getProperties().getBoundOnTheSameField()) {
+            List<Animal> sameTypeAnimals = destinationCell.getAmountOfAnimalsOnCellForType(specification.getType());
+            if (sameTypeAnimals == null) {
+                sameTypeAnimals = new ArrayList<>(0);
+            }
+            if (sameTypeAnimals.size() < specification.getBoundOnTheSameField()) {
                 return destinationCell;
             } else {
                 return this.currentLocation;
@@ -119,6 +113,13 @@ public abstract class Animal implements Callable<Animal> {
         }
     }
 
+    private void walk(Cell destinationCell) {
+        this.currentLocation.deleteAnimal(this);
+        previousLocation = currentLocation;
+        currentLocation = destinationCell;
+        this.currentLocation.addAnimal(this);
+    }
+
     private void feelHunger() {
         currentHealthPoints = currentHealthPoints - starvation * STARVATION_MULTIPLIER;
     }
@@ -126,9 +127,13 @@ public abstract class Animal implements Callable<Animal> {
     /**
      * The animal has a chance to reset scale of starvation to 0 or just to one point below.
      * Dice will be rolled to decide the fait.
-     * If the dice show 20 than this animal is the lucky one! It has a second chance to live! Starvation is fully satisfied now, health restored.
-     * If th result will be more than 10 than this animal can live one more day...
-     * Otherwise sorry, but this animal is dead. Send a flower to it on its grave...
+     * <p>
+     * - If the dice show 20 than this animal is the lucky one!
+     * It has a second chance to live! Starvation is fully satisfied now, health restored.
+     * <p>
+     * - If the result will be more than 10 then this animal can live one more day...
+     * <p>
+     * - Otherwise sorry, but this animal is dead. Send a flower to it on its grave...
      */
     private boolean die() {
         Random dice = new Random();
@@ -147,12 +152,9 @@ public abstract class Animal implements Callable<Animal> {
     }
 
     private boolean breed() {
-        List<Animal> animalsSameType = currentLocation.getAnimalsOnCell()
-                .stream()
-                .filter(a -> a.properties.getType().equals(this.properties.getType()))
-                .toList();
+        List<Animal> animalsSameType = currentLocation.getAmountOfAnimalsOnCellForType(getSpecification().getType());
         int numberOfAnimalsSameType = animalsSameType.size();
-        if (numberOfAnimalsSameType < properties.getBoundOnTheSameField()) {
+        if (numberOfAnimalsSameType < specification.getBoundOnTheSameField()) {
             return animalsSameType
                     .stream()
                     .filter(x -> x.isAdult)
@@ -168,8 +170,8 @@ public abstract class Animal implements Callable<Animal> {
             isAdult = true;
         }
     }
-    public AnimalSpecification getProperties() {
-        return properties;
+    public AnimalSpecification getSpecification() {
+        return specification;
     }
 
     public Cell getCurrentLocation() {

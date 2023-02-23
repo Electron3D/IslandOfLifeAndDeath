@@ -40,19 +40,19 @@ public abstract class HerbivoresAnimal extends Animal implements Herbivores {
     @Override
     public double eatPlant(Plant food) {
         Random chanceToEat = new Random();
-        double chance = getProperties().getChancesToEat(food.getProperties().getType());
+        double chance = getSpecification().getChancesToEat(food.getProperties().getType());
         double restoredHP = 0;
         if (chanceToEat.nextDouble(0, 1) < chance) {
             restoredHP = food.restoreHP();
         }
-        if (restoredHP <= getProperties().getAmountOfFoodToBeFull()) {
+        if (restoredHP <= getSpecification().getAmountOfFoodToBeFull()) {
             if (currentHealthPoints + restoredHP <= startedHealthPoints) {
                 return restoredHP;
             } else {
                 return startedHealthPoints - currentHealthPoints;
             }
         } else {
-            return getProperties().getAmountOfFoodToBeFull();
+            return getSpecification().getAmountOfFoodToBeFull();
         }
     }
 }
