@@ -99,7 +99,7 @@ public abstract class Animal implements Callable<Animal> {
         List<Cell> possibleWays = currentLocation.getPossibleWays();
         Cell destinationCell = possibleWays.get(new Random().nextInt(0, possibleWays.size()));
         if (destinationCell != previousLocation) {
-            List<Animal> sameTypeAnimals = destinationCell.getAmountOfAnimalsOnCellForType(specification.getType());
+            List<Animal> sameTypeAnimals = destinationCell.getAnimalsOnCellOfType(specification.getType());
             if (sameTypeAnimals == null) {
                 sameTypeAnimals = new ArrayList<>(0);
             }
@@ -152,7 +152,7 @@ public abstract class Animal implements Callable<Animal> {
     }
 
     private boolean breed() {
-        List<Animal> animalsSameType = currentLocation.getAmountOfAnimalsOnCellForType(getSpecification().getType());
+        List<Animal> animalsSameType = currentLocation.getAnimalsOnCellOfType(getSpecification().getType());
         int numberOfAnimalsSameType = animalsSameType.size();
         if (numberOfAnimalsSameType < specification.getBoundOnTheSameField()) {
             return animalsSameType

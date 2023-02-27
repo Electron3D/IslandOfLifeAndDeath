@@ -3,7 +3,13 @@ package com.electron3d.model.island;
 import com.electron3d.model.config.AnimalsConfig;
 import com.electron3d.model.creatures.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Island {
     private final int xDimension;
@@ -81,19 +87,68 @@ public class Island {
         if (!checkIsSmbAlive()) {
             return true;
         }
+        List<Plant> plants = collectPlantsFromCells();
+        growPlants(plants);
+        List<Animal> animals = collectAnimalsFromCells();
+        doAnimalStuffParallel(animals);
+        decomposeTheCorpses(animals);
         for (Cell[] cellsRow : cells) {
             for (Cell cell : cellsRow) {
-                cell.growPlants();
-                cell.doAnimalStuffParallel();
-            }
-        }
-        for (Cell[] cellsRow : cells) {
-            for (Cell cell : cellsRow) {
-                cell.decomposeTheCorpses();
                 cell.setNewDay();
             }
         }
         return false;
+    }
+
+    private void growPlants(List<Plant> plants) {
+        PlantSpecification properties = AnimalsConfig.getInstance().getPlantSpecification();
+        for (Plant plant : plants) {
+            Cell plantCell = plant.getLocation();
+            List<Plant> newGrownPlants = new ArrayList<>();
+            int numberOfNewGrownPlants = plant.grow();
+            for (int j = 0; j < numberOfNewGrownPlants; j++) {
+                newGrownPlants.add(new Plant(properties, plantCell));
+            }
+            plantCell.getPlantsOnCell().addAll(newGrownPlants);
+        }
+    }
+
+    public void doAnimalStuffParallel(List<Animal> animals) {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        try {
+            executorService.invokeAll(animals);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        executorService.shutdown();
+        boolean isTerminated;
+        try {
+            isTerminated = executorService.awaitTermination(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if (!isTerminated) {
+            throw new RuntimeException("Timeout ends, executor still isn't terminated.");
+        }
+        for (Animal animal : animals) {
+            if (animal.isBredSuccessfullyToday() && !animal.isDead()) {
+                Cell animalCell = animal.getCurrentLocation();
+                AnimalType animalType = animal.getSpecification().getType();
+                int boundOfThisTypeAnimalOnCell = animal.getSpecification().getBoundOnTheSameField();
+                long amountOfAnimalsThisTypeOnCell = animalCell.getAnimalsOnCellOfType(animalType).size();
+                if (amountOfAnimalsThisTypeOnCell + 1 < boundOfThisTypeAnimalOnCell) {
+                    AnimalFactory factory = new AnimalFactory();
+                    Animal animalToAdd = factory.createAnimal(animalType, animalCell);
+                    animalCell.releaseNewBornAnimal(animalToAdd);
+                }
+            }
+        }
+    }
+
+    public void decomposeTheCorpses(List<Animal> animals) {
+        animals.stream()
+                .filter(Animal::isDead)
+                .forEach(animal -> animal.getCurrentLocation().buryAnimal(animal));
     }
 
     private boolean checkIsSmbAlive() {
@@ -105,6 +160,26 @@ public class Island {
                         .map(Cell::getAmountOfAnimalsOnCell))
                 .reduce(Integer::sum)
                 .orElse(0) > 0;
+    }
+
+    private List<Plant> collectPlantsFromCells() {
+        List<Plant> plants = new ArrayList<>();
+        for (Cell[] cellsRow : cells) {
+            for (Cell cell : cellsRow) {
+                plants.addAll(cell.getPlantsOnCell());
+            }
+        }
+        return plants;
+    }
+
+    private List<Animal> collectAnimalsFromCells() {
+        List<Animal> animals = new ArrayList<>();
+        for (Cell[] cellsRow : cells) {
+            for (Cell cell : cellsRow) {
+                animals.addAll(cell.getAnimalsOnCell());
+            }
+        }
+        return animals;
     }
 
     public Cell[][] getCells() {

@@ -1,10 +1,11 @@
 package com.electron3d.model.island;
 
-import com.electron3d.model.config.AnimalsConfig;
-import com.electron3d.model.creatures.*;
+import com.electron3d.model.creatures.Animal;
+import com.electron3d.model.creatures.AnimalType;
+import com.electron3d.model.creatures.Plant;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Cell {
     private final Map<AnimalType, List<Animal>> animalsOnCellByType = new HashMap<>();
@@ -20,57 +21,6 @@ public class Cell {
         this.y = y;
     }
 
-    public void growPlants() {
-        PlantSpecification properties = AnimalsConfig.getInstance().getPlantSpecification();
-        for (Plant value : plantsOnCell) {
-            List<Plant> newGrownPlants = new ArrayList<>();
-            int numberOfNewGrownPlants = value.grow();
-            for (int j = 0; j < numberOfNewGrownPlants; j++) {
-                newGrownPlants.add(new Plant(properties, this));
-            }
-            plantsOnCell.addAll(newGrownPlants);
-        }
-    }
-
-    public void doAnimalStuffParallel() {
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        List<Animal> animalsOnCell = getAnimalsOnCell();
-        try {
-            executorService.invokeAll(animalsOnCell);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        executorService.shutdown();
-        boolean isTerminated;
-        try {
-            isTerminated = executorService.awaitTermination(2, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        if (!isTerminated) {
-            throw new RuntimeException("Timeout ends, executor still isn't terminated.");
-        }
-        for (Animal animal : animalsOnCell) {
-            if (animal.isBredSuccessfullyToday() && !animal.isDead()) {
-                AnimalType type = animal.getSpecification().getType();
-                int boundOfThisTypeAnimalOnCell = animal.getSpecification().getBoundOnTheSameField();
-                long amountOfAnimalsThisTypeOnCell = animalsOnCellByType.get(type).size();
-                if (amountOfAnimalsThisTypeOnCell + 1 < boundOfThisTypeAnimalOnCell) {
-                    AnimalFactory factory = new AnimalFactory();
-                    Animal animalToAdd = factory.createAnimal(type, animal.getCurrentLocation());
-                    releaseNewBornAnimal(animalToAdd);
-                }
-            }
-        }
-    }
-
-    public void decomposeTheCorpses() {
-        animalsOnCellByType.values().forEach(animalsOnCell -> animalsOnCell
-                .stream()
-                .filter(Animal::isDead)
-                .forEach(this::buryAnimal));
-    }
-
     public void setNewDay() {
         getAnimalsOnCell().forEach(animal -> {
             animal.setWalkedTodayFalse();
@@ -78,7 +28,7 @@ public class Cell {
         });
     }
 
-    private void releaseNewBornAnimal(Animal newBornAnimalToday) {
+    public void releaseNewBornAnimal(Animal newBornAnimalToday) {
         addAnimal(newBornAnimalToday);
         newBornAnimalsCounter++;
     }
@@ -114,7 +64,7 @@ public class Cell {
         return animalsOnCellByType.values().stream().flatMap(Collection::stream).toList();
     }
 
-    public List<Animal> getAmountOfAnimalsOnCellForType(AnimalType type) {
+    public List<Animal> getAnimalsOnCellOfType(AnimalType type) {
         return animalsOnCellByType.get(type);
     }
 
