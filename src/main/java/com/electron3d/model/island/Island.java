@@ -108,7 +108,7 @@ public class Island {
         }
     }
 
-    public void doAnimalStuffParallel(List<Animal> animals) {
+    private void doAnimalStuffParallel(List<Animal> animals) {
         ExecutorService executorService = Executors.newCachedThreadPool();
         try {
             executorService.invokeAll(animals);
@@ -140,7 +140,7 @@ public class Island {
         }
     }
 
-    public void decomposeTheCorpses(List<Animal> animals) {
+    private void decomposeTheCorpses(List<Animal> animals) {
         animals.stream()
                 .filter(Animal::isDead)
                 .forEach(animal -> animal.getCurrentLocation().buryAnimal(animal));
