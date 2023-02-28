@@ -23,9 +23,11 @@ public class SimulationEngine {
 
         while (timer != maxTimeOfSimulationInSeconds) {
             timer++;
-            renderer.printSimulationStateForDay(timer);
             boolean isSimulationEnded = simulation.simulateADay();
-            if (isSimulationEnded) {
+            if (!isSimulationEnded) {
+                renderer.printSimulationStateForDay(timer);
+            } else {
+                renderer.printSimulationResults(timer);
                 break;
             }
             try {
@@ -34,6 +36,5 @@ public class SimulationEngine {
                 throw new RuntimeException(e);
             }
         }
-        renderer.printSimulationResults(timer);
     }
 }

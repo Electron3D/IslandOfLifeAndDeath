@@ -21,13 +21,6 @@ public class Cell {
         this.y = y;
     }
 
-    public void setNewDay() {
-        getAnimalsOnCell().forEach(animal -> {
-            animal.setWalkedTodayFalse();
-            animal.setBredSuccessfullyTodayFalse();
-        });
-    }
-
     public void releaseNewBornAnimal(Animal newBornAnimalToday) {
         addAnimal(newBornAnimalToday);
         newBornAnimalsCounter++;

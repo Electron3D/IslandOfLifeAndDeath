@@ -92,11 +92,6 @@ public class Island {
         List<Animal> animals = collectAnimalsFromCells();
         doAnimalStuffParallel(animals);
         decomposeTheCorpses(animals);
-        for (Cell[] cellsRow : cells) {
-            for (Cell cell : cellsRow) {
-                cell.setNewDay();
-            }
-        }
         return false;
     }
 
@@ -131,7 +126,7 @@ public class Island {
             throw new RuntimeException("Timeout ends, executor still isn't terminated.");
         }
         for (Animal animal : animals) {
-            if (animal.isBredSuccessfullyToday() && !animal.isDead()) {
+            if (!animal.isDead() && animal.isBredSuccessfullyToday()) {
                 Cell animalCell = animal.getCurrentLocation();
                 AnimalType animalType = animal.getSpecification().getType();
                 int boundOfThisTypeAnimalOnCell = animal.getSpecification().getBoundOnTheSameField();

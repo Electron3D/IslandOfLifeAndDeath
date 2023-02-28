@@ -28,6 +28,8 @@ public class Renderer {
         System.out.println("Starting condition:");
         System.out.println("Simulation will continue to " + maxTimer + " day.");
         System.out.println("Time delay multiplier is set to x" + delayMultiplier);
+        System.out.println();
+        getSnapshotOfTheIsland();
     }
 
     public void printSimulationStateForDay(int timer) {
@@ -49,15 +51,13 @@ public class Renderer {
 
     public void printSimulationResults(int timer) {
         System.out.println("\n\n\n");
+        System.out.println("Final results:");
         if (timer >= IslandSimulationConfig.getInstance().getMaxTimeOfSimulationInSeconds()) {
-            System.out.print("Time is over! Final results:\n");
+            System.out.print("Time is over!\n");
         } else {
-            System.out.print("All animals extinct! Final results:\n");
+            System.out.print("All animals extinct!\n");
         }
-        System.out.println("The simulation ended on day " + timer + "\n");
-        getSnapshotOfTheIsland();
-        System.out.println();
-        printStats();
+        System.out.println("The simulation ended on day " + (timer - 1) + "\n");
     }
 
     public void printStats() {

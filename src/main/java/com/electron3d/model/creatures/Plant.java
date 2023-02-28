@@ -6,8 +6,8 @@ import java.util.Random;
 
 public class Plant implements Eatable {
     private final static int LEVEL_TO_START_GROWING = 2;
-    private final static int MULTIPLIER_OF_BERRIES_PER_PLANT = 20;
-    private final static int MAX_NUMBER_OF_NEW_GROWN_PLANTS = 10;
+    private final static int MULTIPLIER_OF_BERRIES_PER_PLANT = 10;
+    private final static int MAX_NUMBER_OF_NEW_GROWN_PLANTS = 5;
     private final PlantSpecification properties;
     private final Cell location;
     private double numberOfBerries;

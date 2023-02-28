@@ -19,7 +19,6 @@ public abstract class Animal implements Callable<Animal> {
     private int daysAliveCounter;
     private boolean isAdult;
     private volatile boolean isDead;
-    private boolean walkedToday;
     private boolean bredSuccessfullyToday;
     private Cell previousLocation;
     private Cell currentLocation;
@@ -33,7 +32,7 @@ public abstract class Animal implements Callable<Animal> {
 
     @Override
     public Animal call() {
-        if (!walkedToday && !isDead) {
+        if (!isDead) {
             tryToCompleteDailyGoals();
         }
         return this;
@@ -45,12 +44,12 @@ public abstract class Animal implements Callable<Animal> {
      *  for success breeding
      */
     private void tryToCompleteDailyGoals() {
+        bredSuccessfullyToday = false;
         boolean success = roamInSearchOfFood();
         feelHunger();
         if (currentHealthPoints <= 0) {
             isDead = die();
         }
-        walkedToday = true;
         if (success && !isDead) {
             growUp();
             if (isAdult) {
@@ -194,15 +193,7 @@ public abstract class Animal implements Callable<Animal> {
         isDead = dead;
     }
 
-    public void setWalkedTodayFalse() {
-        this.walkedToday = false;
-    }
-
     public boolean isBredSuccessfullyToday() {
         return bredSuccessfullyToday;
-    }
-
-    public void setBredSuccessfullyTodayFalse() {
-        this.bredSuccessfullyToday = false;
     }
 }
