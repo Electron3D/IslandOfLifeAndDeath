@@ -23,6 +23,12 @@ public abstract class Animal implements Callable<Animal> {
     private Cell previousLocation;
     private Cell currentLocation;
     public Animal(AnimalSpecification specification, Cell currentLocation) {
+        if (specification == null) {
+            throw new IllegalArgumentException("Specification can't be null.");
+        }
+        if (currentLocation == null) {
+            throw new IllegalArgumentException("Current location can't be null.");
+        }
         this.specification = specification;
         this.fullEnoughLevel = specification.getAmountOfFoodToBeFull();
         this.startedHealthPoints = (int) ((specification.getWeight() - specification.getAmountOfFoodToBeFull()) * 1000);

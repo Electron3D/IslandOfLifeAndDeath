@@ -2,9 +2,9 @@ package com.electron3d.model.creatures;
 
 import org.junit.jupiter.api.Test;
 
-public class AnimalTest {
+public class PlantTest {
     @Test
-    public void tryToCompleteDailyGoalsHappyTest() {
+    public void test() {
 
     }
 }

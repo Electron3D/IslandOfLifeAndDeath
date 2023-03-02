@@ -17,6 +17,12 @@ public class Cell {
     private final int y;
 
     public Cell(int x, int y) {
+        if (x < 0) {
+            throw new IllegalArgumentException("Variable X can't be negative.");
+        }
+        if (y < 0) {
+            throw new IllegalArgumentException("Variable Y can't be negative.");
+        }
         this.x = x;
         this.y = y;
     }
